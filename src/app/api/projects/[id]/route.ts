@@ -2,108 +2,84 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-
     const project = await prisma.project.findFirst({
       where: {
-        OR: [{ id: id }, { slug: id }],
+        OR: [{ id }, { slug: id }],
       },
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project tidak ditemukan." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     return NextResponse.json(project);
   } catch (error) {
-    console.error("GET /api/projects/[id] error:", error);
-    return NextResponse.json(
-      { error: "Gagal mengambil detail project." },
-      { status: 500 }
-    );
+    console.error("Error fetching project:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: "Tidak memiliki hak akses." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
-    const body = await request.json();
-    const { title, slug, description, content, image, demoUrl, githubUrl, tags, featured } = body;
+    const body = await req.json();
 
-    const existing = await prisma.project.findUnique({ where: { id } });
-    if (!existing) {
-      return NextResponse.json(
-        { error: "Project tidak ditemukan." },
-        { status: 404 }
-      );
-    }
-
-    const updatedProject = await prisma.project.update({
+    const updated = await prisma.project.update({
       where: { id },
       data: {
-        title: title ?? existing.title,
-        slug: slug ?? existing.slug,
-        description: description ?? existing.description,
-        content: content !== undefined ? content : existing.content,
-        image: image !== undefined ? image : existing.image,
-        demoUrl: demoUrl !== undefined ? demoUrl : existing.demoUrl,
-        githubUrl: githubUrl !== undefined ? githubUrl : existing.githubUrl,
-        tags: Array.isArray(tags) ? tags.join(",") : (tags ?? existing.tags),
-        featured: featured !== undefined ? Boolean(featured) : existing.featured,
+        title: body.title,
+        slug: body.slug,
+        thumbnail: body.thumbnail,
+        gallery: typeof body.gallery === "string" ? body.gallery : JSON.stringify(body.gallery || []),
+        shortDesc: body.shortDesc,
+        longDesc: body.longDesc,
+        techStack: typeof body.techStack === "string" ? body.techStack : JSON.stringify(body.techStack || []),
+        githubUrl: body.githubUrl,
+        demoUrl: body.demoUrl,
+        client: body.client,
+        year: body.year,
+        duration: body.duration,
+        category: body.category,
+        status: body.status,
+        featured: Boolean(body.featured),
+        highlight: body.highlight,
+        projectType: body.projectType,
+        challenge: body.challenge,
+        solution: body.solution,
+        result: body.result,
+        screenshots: typeof body.screenshots === "string" ? body.screenshots : JSON.stringify(body.screenshots || []),
+        videoDemo: body.videoDemo,
+        seoImage: body.seoImage,
       },
     });
 
-    return NextResponse.json(updatedProject);
+    return NextResponse.json(updated);
   } catch (error) {
-    console.error("PUT /api/projects/[id] error:", error);
-    return NextResponse.json(
-      { error: "Gagal mengupdate project." },
-      { status: 500 }
-    );
+    console.error("Error updating project:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) {
-      return NextResponse.json(
-        { error: "Tidak memiliki hak akses." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
     await prisma.project.delete({ where: { id } });
-
-    return NextResponse.json({ success: true, message: "Project berhasil dihapus." });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("DELETE /api/projects/[id] error:", error);
-    return NextResponse.json(
-      { error: "Gagal menghapus project." },
-      { status: 500 }
-    );
+    console.error("Error deleting project:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

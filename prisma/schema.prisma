@@ -3,29 +3,188 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
 }
 
-model User {
+model AdminUser {
   id        String   @id @default(uuid())
+  username  String   @unique
   email     String   @unique
-  password  String
   name      String?
+  role      String   @default("ADMIN")
+  deactive  Boolean  @default(false) // true = disabled admin account
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model OtpToken {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model HeroSection {
+  id               String   @id @default("default")
+  title            String   @default("We Build From Scratch")
+  subtitle         String   @default("Innovative Software & Systems")
+  description      String   @default("SkyLogic creates high-performance web applications, mobile platforms, and custom software systems engineered to scale.")
+  ctaButton        String   @default("Explore Projects")
+  ctaLink          String   @default("#projects")
+  bgImage          String   @default("")
+  bgGradient       String   @default("from-slate-100 via-indigo-50 to-slate-200")
+  badge            String   @default("SKYLOGIC // ENTERPRISE SOFTWARE ARCHITECTURE")
+  partnerLogos     String   @default("[]")
+  socialLinks      String   @default("[]")
+  isOpenForProject Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
+}
+
+model TeamMember {
+  id           String   @id @default(uuid())
+  name         String
+  role         String
+  bio          String
+  avatar       String   @default("")
+  linkedin     String   @default("")
+  github       String   @default("")
+  instagram    String   @default("")
+  email        String   @default("")
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TeamSectionInfo {
+  id          String   @id @default("default")
+  title       String   @default("Meet Our Engineering Team")
+  description String   @default("Architects, full-stack developers, and designers crafting world-class digital products.")
+  updatedAt   DateTime @updatedAt
 }
 
 model Project {
   id          String   @id @default(uuid())
   title       String
   slug        String   @unique
-  description String
-  content     String?
-  image       String?
-  demoUrl     String?
-  githubUrl   String?
-  tags        String   @default("")
+  thumbnail   String   @default("")
+  gallery     String   @default("[]")
+  shortDesc   String
+  longDesc    String
+  techStack   String   @default("[]")
+  githubUrl   String   @default("")
+  demoUrl     String   @default("")
+  client      String   @default("")
+  year        String   @default("2026")
+  duration    String   @default("3 Months")
+  category    String   @default("Website")
+  status      String   @default("Completed")
   featured    Boolean  @default(false)
+  highlight   String   @default("")
+  projectType String   @default("Enterprise")
+  challenge   String   @default("")
+  solution    String   @default("")
+  result      String   @default("")
+  screenshots String   @default("[]")
+  videoDemo   String   @default("")
+  seoImage    String   @default("")
+  isActive    Boolean  @default(true) // Switch to display/hide on public website
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model TechStack {
+  id           String   @id @default(uuid())
+  name         String
+  icon         String   @default("")
+  color        String   @default("#6366F1")
+  level        String   @default("Expert")
+  category     String   @default("Framework")
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true) // Switch to display/hide on public website
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Service {
+  id           String   @id @default(uuid())
+  icon         String   @default("Code")
+  title        String
+  description  String
+  cta          String   @default("Learn More")
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true) // Switch to display/hide on public website
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactInfo {
+  id            String   @id @default("default")
+  email         String   @default("contact@skylogic.id")
+  whatsapp      String   @default("+6281234567890")
+  instagram     String   @default("https://instagram.com/skylogic.id")
+  linkedin      String   @default("https://linkedin.com/company/skylogic")
+  github        String   @default("https://github.com/skylogic")
+  discord       String   @default("https://discord.gg/skylogic")
+  telegram      String   @default("https://t.me/skylogic")
+  address       String   @default("Jakarta, Indonesia")
+  googleMapsUrl String   @default("https://maps.google.com")
+  updatedAt     DateTime @updatedAt
+}
+
+model LeaveYourMark {
+  id         String   @id @default(uuid())
+  name       String
+  message    String
+  color      String   @default("yellow")
+  isPinned   Boolean  @default(false)
+  isApproved Boolean  @default(true)
+  isHidden   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model VisitorLog {
+  id              String   @id @default(uuid())
+  ip              String   @default("127.0.0.1")
+  path            String   @default("/")
+  device          String   @default("Desktop")
+  browser         String   @default("Chrome")
+  os              String   @default("Windows")
+  country         String   @default("Indonesia")
+  city            String   @default("Jakarta")
+  referral        String   @default("Direct")
+  sessionDuration Int      @default(0)
+  createdAt       DateTime @default(now())
+}
+
+model MediaFile {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String
+  url          String
+  mimeType     String
+  size         Int
+  folder       String   @default("general")
+  createdAt    DateTime @default(now())
+}
+
+model SiteSetting {
+  id              String   @id @default("default")
+  siteName        String   @default("SkyLogic")
+  logo            String   @default("")
+  favicon         String   @default("")
+  footerText      String   @default("Empowering businesses with software built from scratch.")
+  copyright       String   @default("© 2026 SkyLogic Inc. All rights reserved.")
+  primaryColor    String   @default("#6366F1")
+  secondaryColor  String   @default("#06B6D4")
+  darkModeDefault Boolean  @default(false)
+  metaTitle       String   @default("SkyLogic - We Build From Scratch")
+  metaDescription String   @default("Leading software engineering company building high-performance web applications.")
+  ogImage         String   @default("")
+  robots          String   @default("index, follow")
+  sitemap         String   @default("https://skylogic.id/sitemap.xml")
+  updatedAt       DateTime @updatedAt
 }

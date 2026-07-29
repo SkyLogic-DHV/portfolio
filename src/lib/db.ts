@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
-  const url = process.env.DATABASE_URL || "file:./dev.db";
-  const adapter = new PrismaBetterSqlite3({ url });
+  const connectionUrl = process.env.DATABASE_URL || "mysql://root:dbnofun@localhost:3306/skylogic_db";
+  const adapter = new PrismaMariaDb(connectionUrl);
   return new PrismaClient({ adapter });
 }
 

@@ -15,7 +15,7 @@ export default function NewProjectPage() {
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
-    description: "",
+    shortDesc: "",
     content: "",
     image: "",
     demoUrl: "",
@@ -134,8 +134,8 @@ export default function NewProjectPage() {
               required
               rows={2}
               placeholder="Jelaskan secara singkat tujuan dan fitur utama project..."
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              value={formData.shortDesc}
+              onChange={(e) => setFormData({ ...formData, shortDesc: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
             />
           </div>

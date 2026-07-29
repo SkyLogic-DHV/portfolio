@@ -14,9 +14,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.adminUser.findUnique({
       where: { email },
     });
+    const allowedEmails = [
+      'moluscaxyz@gmail.com',
+      'heratonyputri@gmail.com',
+      'meriaamelia01@gmail.com',
+    ];
+    if (!allowedEmails.includes(email)) {
+      return NextResponse.json({ error: 'Unauthorized email' }, { status: 403 });
+    }
 
     if (!user) {
       return NextResponse.json(
@@ -25,13 +33,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: "Email atau password salah." },
-        { status: 401 }
-      );
-    }
+    return NextResponse.json(
+      { error: "Password login belum didukung. Gunakan OTP login." },
+      { status: 400 }
+    );
 
     const token = signToken({
       userId: user.id,

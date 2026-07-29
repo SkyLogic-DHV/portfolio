@@ -1,80 +1,98 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import prisma from "../../../lib/utils/prisma";
 import { getAdminSession } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin";
 
-export async function GET(request: Request) {
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const featuredOnly = searchParams.get("featured") === "true";
+    const { searchParams } = new URL(req.url);
+    const category = searchParams.get("category");
+    const featured = searchParams.get("featured");
+    const search = searchParams.get("search");
 
-    const whereCondition = featuredOnly ? { featured: true } : {};
+    const where: Record<string, unknown> = {};
+
+    if (category && category !== "All") {
+      where.category = category;
+    }
+
+    if (featured === "true") {
+      where.featured = true;
+    }
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search } },
+        { shortDesc: { contains: search } },
+        { techStack: { contains: search } },
+      ];
+    }
 
     const projects = await prisma.project.findMany({
-      where: whereCondition,
+      where,
       orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(projects);
   } catch (error) {
-    console.error("GET /api/projects error:", error);
-    return NextResponse.json(
-      { error: "Gagal mengambil data project." },
-      { status: 500 }
-    );
+    console.error("Error fetching projects:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const session = await getAdminSession();
+    const session = await requireAdmin();
     if (!session) {
-      return NextResponse.json(
-        { error: "Tidak memiliki hak akses." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { title, slug, description, content, image, demoUrl, githubUrl, tags, featured } = body;
-
-    if (!title || !description) {
+    const body = await req.json();
+    if (!body.title) {
       return NextResponse.json(
-        { error: "Judul dan deskripsi wajib diisi." },
+        { error: "Title is required" },
         { status: 400 }
       );
     }
+    
+    const slug =
+      body.slug ||
+      body.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
 
-    // Auto-generate slug if not provided
-    const projectSlug = slug
-      ? slug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
-      : title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
-
-    const newProject = await prisma.project.create({
+    const project = await prisma.project.create({
       data: {
-        title,
-        slug: projectSlug,
-        description,
-        content: content || null,
-        image: image || null,
-        demoUrl: demoUrl || null,
-        githubUrl: githubUrl || null,
-        tags: Array.isArray(tags) ? tags.join(",") : (tags || ""),
-        featured: Boolean(featured),
+        title: body.title,
+        slug,
+        thumbnail: body.thumbnail || "",
+        gallery: typeof body.gallery === "string" ? body.gallery : JSON.stringify(body.gallery || []),
+        shortDesc: body.shortDesc,
+        longDesc: body.longDesc || body.shortDesc,
+        techStack: typeof body.techStack === "string" ? body.techStack : JSON.stringify(body.techStack || []),
+        githubUrl: body.githubUrl || "",
+        demoUrl: body.demoUrl || "",
+        client: body.client || "",
+        year: body.year || "2026",
+        duration: body.duration || "3 Months",
+        category: body.category || "Website",
+        status: body.status || "Completed",
+        featured: Boolean(body.featured),
+        highlight: body.highlight || "",
+        projectType: body.projectType || "Enterprise",
+        challenge: body.challenge || "",
+        solution: body.solution || "",
+        result: body.result || "",
+        screenshots: typeof body.screenshots === "string" ? body.screenshots : JSON.stringify(body.screenshots || []),
+        videoDemo: body.videoDemo || "",
+        seoImage: body.seoImage || "",
       },
     });
 
-    return NextResponse.json(newProject, { status: 201 });
-  } catch (error: unknown) {
-    console.error("POST /api/projects error:", error);
-    if (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") {
-      return NextResponse.json(
-        { error: "Slug project sudah digunakan, gunakan judul lain." },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      { error: "Gagal membuat project baru." },
-      { status: 500 }
-    );
+    return NextResponse.json(project);
+  } catch (error) {
+    console.error("Error creating project:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

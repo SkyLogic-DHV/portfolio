@@ -1,0 +1,23 @@
+
+> portfolio@0.1.0 build
+> npx cross-env NODE_OPTIONS="--max-old-space-size=4096" next build
+
+▲ Next.js 16.2.12 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.3s
+  Running TypeScript ...
+Failed to type check.
+
+./src/app/api/auth/login/route.ts:42:15
+Type error: 'user' is possibly 'null'.
+
+  [90m40 |[0m
+  [90m41 |[0m     [36mconst[0m token = signToken({
+[31m[1m>[0m [90m42 |[0m       userId: user.id,
+  [90m   |[0m               [31m[1m^[0m
+  [90m43 |[0m       email: user.email,
+  [90m44 |[0m       name: user.name,
+  [90m45 |[0m     });
+Next.js build worker exited with code: 1 and signal: null

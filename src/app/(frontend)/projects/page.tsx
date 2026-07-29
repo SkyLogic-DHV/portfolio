@@ -1,14 +1,13 @@
 import { prisma } from "@/lib/db";
 import ProjectCard from "@/components/frontend/ProjectCard";
 import { FolderGit2 } from "lucide-react";
-import { Project } from "@/types";
 
 export const revalidate = 0;
 
 export default async function ProjectsPage() {
-  const projects = (await prisma.project.findMany({
+  const projects = await prisma.project.findMany({
     orderBy: { createdAt: "desc" },
-  })) as Project[];
+  });
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-8">

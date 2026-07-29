@@ -9,9 +9,9 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const tagsList = typeof project.tags === "string" 
-    ? project.tags.split(",").map(t => t.trim()).filter(Boolean)
-    : project.tags || [];
+  const tagsList = typeof project.techStack === "string" 
+    ? project.techStack.split(",").map(t => t.trim()).filter(Boolean)
+    : [];
 
   return (
     <div className="group relative rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 overflow-hidden flex flex-col">
@@ -23,9 +23,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       )}
 
       <div className="relative h-48 w-full bg-slate-950 overflow-hidden">
-        {project.image ? (
+        {project.thumbnail ? (
           <img
-            src={project.image}
+            src={project.thumbnail}
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
@@ -55,7 +55,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </h3>
 
           <p className="text-slate-400 text-sm mt-2 line-clamp-2">
-            {project.description}
+            {project.shortDesc}
           </p>
         </div>
 

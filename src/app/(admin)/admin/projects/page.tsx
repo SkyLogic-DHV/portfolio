@@ -1,186 +1,184 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { PlusCircle, Edit, Trash2, ExternalLink, Star, Search, AlertCircle } from "lucide-react";
-import { Project } from "@/types";
+import { Briefcase, Plus, Trash2, Edit, X } from "lucide-react";
 
-export default function AdminProjectsListPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+export default function AdminProjectsPage() {
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [form, setForm] = useState({
+    title: "",
+    thumbnail: "",
+    shortDesc: "",
+    longDesc: "",
+    category: "Website",
+    featured: false,
+    highlight: "",
+    client: "",
+    year: "2026",
+    duration: "3 Months",
+    githubUrl: "",
+    demoUrl: "",
+    challenge: "",
+    solution: "",
+    result: "",
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadData() {
-      try {
-        const res = await fetch("/api/projects");
-        if (res.ok && isMounted) {
-          const data = await res.json();
-          setProjects(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch projects:", error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-    loadData();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus project "${title}"?`)) return;
-
-    try {
-      setDeletingId(id);
-      const res = await fetch(`/api/projects/${id}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setProjects((prev) => prev.filter((p) => p.id !== id));
-      } else {
-        alert("Gagal menghapus project.");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert("Terjadi kesalahan saat menghapus.");
-    } finally {
-      setDeletingId(null);
-    }
+  const loadProjects = () => {
+    fetch("/api/projects")
+      .then((res) => res.json())
+      .then((data) => setProjects(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   };
 
-  const filteredProjects = projects.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.tags?.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetch("/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    setIsCreating(false);
+    loadProjects();
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetch(`/api/projects/${editingProject.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editingProject),
+    });
+    setEditingProject(null);
+    loadProjects();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete project?")) return;
+    await fetch(`/api/projects/${id}`, { method: "DELETE" });
+    loadProjects();
+  };
+
+  if (loading) return <div className="text-slate-400 font-mono text-xs">Loading Projects...</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="max-w-6xl space-y-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Kelola Project</h1>
-          <p className="text-sm text-slate-400">Daftar lengkap karya portfolio di database.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+            <Briefcase className="w-6 h-6 text-sky-400" />
+            <span>Project Portfolio Manager</span>
+          </h1>
+          <p className="text-xs text-slate-400 font-mono mt-1">
+            CRUD & MANAGE CASE STUDIES & FEATURED PROJECTS
+          </p>
         </div>
 
-        <Link
-          href="/admin/projects/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-colors"
+        <button
+          onClick={() => setIsCreating(true)}
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white flex items-center space-x-1.5"
         >
-          <PlusCircle className="w-4 h-4" />
-          Tambah Project Baru
-        </Link>
+          <Plus className="w-4 h-4" />
+          <span>Add Project</span>
+        </button>
       </div>
 
-      {/* Search Filter */}
-      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
-        <Search className="w-4 h-4 text-slate-500" />
-        <input
-          type="text"
-          placeholder="Cari berdasarkan judul atau tag..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
-        />
-      </div>
+      {isCreating && (
+        <form onSubmit={handleCreate} className="bg-slate-900 border border-indigo-500/40 rounded-3xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-white">Create New Project</h3>
+            <button type="button" onClick={() => setIsCreating(false)} className="text-slate-400 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Title"
+              required
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+            />
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+            >
+              <option value="Website">Website</option>
+              <option value="Mobile">Mobile</option>
+              <option value="AI">AI</option>
+              <option value="Cyber Security">Cyber Security</option>
+              <option value="UI/UX">UI/UX</option>
+              <option value="Automation">Automation</option>
+              <option value="Internal Tools">Internal Tools</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Thumbnail Image URL"
+              value={form.thumbnail}
+              onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+            />
+            <input
+              type="text"
+              placeholder="Highlight Badge (e.g. Realtime Multi-Agent Engine)"
+              value={form.highlight}
+              onChange={(e) => setForm({ ...form, highlight: e.target.value })}
+              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+            />
+          </div>
+          <textarea
+            placeholder="Short Description"
+            required
+            value={form.shortDesc}
+            onChange={(e) => setForm({ ...form, shortDesc: e.target.value })}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+          />
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="featured"
+              checked={form.featured}
+              onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+              className="w-4 h-4 rounded bg-slate-950 border-slate-800 text-indigo-600"
+            />
+            <label htmlFor="featured" className="text-xs text-slate-300">Feature on Homepage</label>
+          </div>
+          <button type="submit" className="px-5 py-2.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white">
+            Create Project
+          </button>
+        </form>
+      )}
 
-      {/* Table */}
-      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-        {loading ? (
-          <div className="py-12 text-center text-slate-400 text-sm">Memuat data project...</div>
-        ) : filteredProjects.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase">
-                <tr>
-                  <th className="p-3.5 rounded-l-xl">Project</th>
-                  <th className="p-3.5">Deskripsi</th>
-                  <th className="p-3.5">Tags</th>
-                  <th className="p-3.5">Featured</th>
-                  <th className="p-3.5 rounded-r-xl text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filteredProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="p-3.5 font-semibold text-white">
-                      <div className="flex items-center gap-3">
-                        {project.image ? (
-                          <img
-                            src={project.image}
-                            alt=""
-                            className="w-12 h-12 rounded-xl object-cover bg-slate-950 border border-slate-800"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] text-slate-500 font-mono">
-                            No Img
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-bold text-white text-sm">{project.title}</p>
-                          <span className="text-xs text-slate-500 font-mono">/{project.slug}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-3.5 text-xs text-slate-400 max-w-[250px] truncate">
-                      {project.description}
-                    </td>
-                    <td className="p-3.5 text-xs text-slate-400 max-w-[150px] truncate">
-                      {project.tags}
-                    </td>
-                    <td className="p-3.5">
-                      {project.featured ? (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 w-fit">
-                          <Star className="w-3 h-3 fill-amber-300" />
-                          Featured
-                        </span>
-                      ) : (
-                        <span className="text-xs text-slate-600">-</span>
-                      )}
-                    </td>
-                    <td className="p-3.5 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <Link
-                          href={`/admin/projects/${project.id}`}
-                          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-400 transition-colors"
-                          title="Edit Project"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(project.id, project.title)}
-                          disabled={deletingId === project.id}
-                          className="p-2 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-rose-400 transition-colors disabled:opacity-50"
-                          title="Hapus Project"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                        <Link
-                          href={`/projects/${project.slug}`}
-                          target="_blank"
-                          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-                          title="Lihat Tampilan Publik"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Projects List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {projects.map((p) => (
+          <div key={p.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <img src={p.thumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"} alt={p.title} className="w-full h-36 object-cover rounded-xl border border-slate-800 mb-4" />
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400">{p.category}</span>
+                {p.featured && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">Featured</span>}
+              </div>
+              <h3 className="font-bold text-base text-white">{p.title}</h3>
+              <p className="text-xs text-slate-400 mt-1 line-clamp-2">{p.shortDesc}</p>
+            </div>
+            <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono text-slate-500">{p.year}</span>
+              <button onClick={() => handleDelete(p.id)} className="p-2 text-slate-400 hover:text-rose-400">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="py-12 text-center text-slate-500 space-y-2">
-            <AlertCircle className="w-8 h-8 text-slate-600 mx-auto" />
-            <p className="text-sm">Tidak ada project yang cocok dengan pencarian.</p>
-          </div>
-        )}
+        ))}
       </div>
     </div>
   );

@@ -25,9 +25,9 @@ export default async function ProjectDetailPage({
     notFound();
   }
 
-  const tagsList = typeof project.tags === "string"
-    ? project.tags.split(",").map((t) => t.trim()).filter(Boolean)
-    : project.tags || [];
+  const tagsList = typeof project.techStack === "string"
+    ? project.techStack.split(",").map((t) => t.trim()).filter(Boolean)
+    : [];
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
@@ -70,10 +70,10 @@ export default async function ProjectDetailPage({
         </div>
       </div>
 
-      {project.image && (
+      {project.thumbnail && (
         <div className="rounded-2xl overflow-hidden border border-slate-800 max-h-[450px]">
           <img
-            src={project.image}
+            src={project.thumbnail}
             alt={project.title}
             className="w-full h-full object-cover"
           />
@@ -84,15 +84,15 @@ export default async function ProjectDetailPage({
         <div>
           <h3 className="text-lg font-bold text-white mb-2">Ringkasan Project</h3>
           <p className="text-slate-300 text-base leading-relaxed">
-            {project.description}
+            {project.shortDesc}
           </p>
         </div>
 
-        {project.content && (
+        {project.longDesc && (
           <div className="pt-6 border-t border-slate-800">
             <h3 className="text-lg font-bold text-white mb-3">Detail & Fitur Utama</h3>
             <div className="text-slate-300 leading-relaxed whitespace-pre-line text-sm sm:text-base">
-              {project.content}
+              {project.longDesc}
             </div>
           </div>
         )}
