@@ -1,3 +1,4 @@
+import "dotenv/config";
 import prisma from "../src/lib/utils/prisma.js";
 
 async function main() {
@@ -48,4 +49,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    process.exit(0);
   });
