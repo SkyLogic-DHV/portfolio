@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { ContactUsModal } from "./Contact_Us";
 
 export interface HeroData {
   title: string;
@@ -18,6 +20,8 @@ export interface HeroData {
 }
 
 export function HeroSection({ hero }: { hero: HeroData }) {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
   return (
     <section className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Outer Hero Container - Dark Minimalist Frame */}
@@ -90,12 +94,13 @@ export function HeroSection({ hero }: { hero: HeroData }) {
                 <ArrowRight className="w-4 h-4" />
               </a>
 
-              <a
-                href="#leave-your-mark"
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-slate-200 hover:text-white hover:border-slate-500 font-semibold text-sm transition-all"
+              <button
+                type="button"
+                onClick={() => setIsContactOpen(true)}
+                className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-slate-200 hover:text-white hover:border-slate-500 font-semibold text-sm transition-all cursor-pointer"
               >
-                Leave Your Mark 📍
-              </a>
+                Contact Us
+              </button>
             </div>
           </motion.div>
 
@@ -130,6 +135,8 @@ export function HeroSection({ hero }: { hero: HeroData }) {
           </div>
         </div>
       </div>
+      {/* Contact Us Popup Modal */}
+      <ContactUsModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </section>
   );
 }
