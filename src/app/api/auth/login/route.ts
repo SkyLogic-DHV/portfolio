@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { signToken, COOKIE_NAME } from "@/lib/auth";
-import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
@@ -37,27 +35,6 @@ export async function POST(request: Request) {
       { error: "Password login belum didukung. Gunakan OTP login." },
       { status: 400 }
     );
-
-    const token = signToken({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
-    });
-
-    const response = NextResponse.json({
-      success: true,
-      user: { id: user.id, email: user.email, name: user.name },
-    });
-
-    response.cookies.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
-
-    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
