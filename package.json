@@ -17,6 +17,8 @@
     "@prisma/client": "^7.9.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "framer-motion": "^12.42.2",
     "jsonwebtoken": "^9.0.3",
@@ -29,7 +31,8 @@
     "pg": "^8.22.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "seed": "^0.4.4"
+    "seed": "^0.4.4",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
