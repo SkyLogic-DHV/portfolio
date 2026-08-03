@@ -1,4 +1,4 @@
-import prisma  from "./../../lib/utils/prisma";
+import prisma from "./../../lib/utils/prisma";
 import type { LeaveYourMark } from "@prisma/client";
 import { Navbar } from "@/components/frontend/Navbar";
 import { HeroSection } from "@/components/frontend/HeroSection";

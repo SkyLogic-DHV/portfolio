@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Sparkles, X, CheckCircle2 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/BrandIcons";
+import { InfoCard } from "@/components/ui/info-card";
 
 export interface ProjectData {
   id: string;
@@ -67,11 +68,10 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
-              activeCategory === cat
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${activeCategory === cat
                 ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
                 : "bg-gray-100 border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300"
-            }`}
+              }`}
           >
             {cat}
           </button>
@@ -88,6 +88,14 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
             stackList = [];
           }
 
+          const colors = [
+            { border: "var(--border-color-1)", hover: "var(--hover-text-color-1)" },
+            { border: "var(--border-color-2)", hover: "var(--hover-text-color-2)" },
+            { border: "var(--border-color-3)", hover: "var(--hover-text-color-3)" },
+          ];
+          
+          const colorConfig = colors[index % colors.length];
+
           return (
             <motion.div
               key={project.id}
@@ -95,94 +103,49 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: index * 0.05 }}
-              className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-indigo-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+              onClick={() => setSelectedProject(project)}
+              className="flex justify-center items-center w-full"
             >
-              {/* Thumbnail Image */}
-              <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                <img
-                  src={
+              <div 
+                className="file-container w-full"
+                style={{
+                  maxWidth: 388,
+                  height: 378,
+                  borderRadius: "1em",
+                  position: "relative",
+                  overflow: "hidden",
+                  padding: 0,
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: "none",
+                  boxSizing: "border-box",
+                  ["--hover-text-color" as any]: colorConfig.hover,
+                }}
+              >
+                <InfoCard
+                  image={
                     project.thumbnail ||
                     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
                   }
-                  alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  title={project.title}
+                  description={project.shortDesc}
+                  width="100%"
+                  height="100%"
+                  borderColor={colorConfig.border}
+                  borderBgColor="var(--border-bg-color)"
+                  cardBgColor="var(--card-bg-color)"
+                  shadowColor="var(--shadow-color)"
+                  textColor="var(--text-color)"
+                  hoverTextColor={colorConfig.hover}
+                  fontFamily="var(--font-family)"
+                  rtlFontFamily="var(--rtl-font-family)"
+                  effectBgColor={colorConfig.border}
+                  patternColor1="var(--pattern-color1)"
+                  patternColor2="var(--pattern-color2)"
+                  contentPadding="14.3px 16px"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent" />
-
-                {/* Badges */}
-                <div className="absolute top-3 left-3 flex items-center space-x-2">
-                  <span className="px-2.5 py-1 rounded-md bg-white/90 border border-gray-200 text-[10px] font-mono text-gray-700">
-                    {project.category}
-                  </span>
-                  {project.highlight && (
-                    <span className="px-2.5 py-1 rounded-md bg-amber-100 border border-amber-300 text-[10px] font-semibold text-amber-700 flex items-center space-x-1">
-                      <Sparkles className="w-3 h-3" />
-                      <span>{project.highlight}</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Project Content */}
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="mt-2 text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                    {project.shortDesc}
-                  </p>
-
-                  {/* Tech Stack Pills */}
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {stackList.slice(0, 4).map((tech, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-0.5 rounded bg-gray-100 text-[10px] font-mono text-gray-600"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                    {stackList.length > 4 && (
-                      <span className="px-2 py-0.5 rounded bg-gray-100 text-[10px] font-mono text-gray-400">
-                        +{stackList.length - 4}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <button
-                    onClick={() => setSelectedProject(project)}
-                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-                  >
-                    View Details →
-                  </button>
-
-                  <div className="flex items-center space-x-3 text-gray-400">
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:text-gray-900 transition-colors"
-                      >
-                        <GithubIcon className="w-4 h-4" />
-                      </a>
-                    )}
-                    {project.demoUrl && (
-                      <a
-                        href={project.demoUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:text-gray-900 transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                </div>
               </div>
             </motion.div>
           );
