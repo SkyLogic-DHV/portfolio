@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { AlertCircle, ArrowLeft, Save, Upload } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, Save, Upload, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
 
 export default function EditProjectPage({
   params,
@@ -22,13 +22,27 @@ export default function EditProjectPage({
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
-    description: "",
-    content: "",
-    image: "",
+    shortDesc: "",
+    longDesc: "",
+    thumbnail: "",
     demoUrl: "",
     githubUrl: "",
     tags: "",
     featured: false,
+    client: "",
+    year: "2026",
+    duration: "3 Months",
+    category: "Website",
+    status: "In Progress",
+    highlight: "",
+    challenge: "",
+    solution: "",
+    result: "",
+    assignedAdminId: "",
+    orderedAt: "",
+    completedAt: "",
+    revisionUsed: 0,
+    isActive: true,
   });
 
   useEffect(() => {
@@ -41,13 +55,27 @@ export default function EditProjectPage({
         setFormData({
           title: data.title || "",
           slug: data.slug || "",
-          description: data.description || "",
-          content: data.content || "",
-          image: data.image || "",
+          shortDesc: data.shortDesc || "",
+          longDesc: data.longDesc || "",
+          thumbnail: data.thumbnail || "",
           demoUrl: data.demoUrl || "",
           githubUrl: data.githubUrl || "",
           tags: data.tags || "",
           featured: Boolean(data.featured),
+          client: data.client || "",
+          year: data.year || "2026",
+          duration: data.duration || "3 Months",
+          category: data.category || "Website",
+          status: data.status || "In Progress",
+          highlight: data.highlight || "",
+          challenge: data.challenge || "",
+          solution: data.solution || "",
+          result: data.result || "",
+          assignedAdminId: data.assignedAdminId || "",
+          orderedAt: data.orderedAt ? String(data.orderedAt).slice(0, 10) : "",
+          completedAt: data.completedAt ? String(data.completedAt).slice(0, 10) : "",
+          revisionUsed: Number(data.revisionUsed || 0),
+          isActive: data.isActive !== false,
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Gagal memuat data project.";
@@ -76,7 +104,7 @@ export default function EditProjectPage({
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Gagal mengunggah gambar");
 
-      setFormData((prev) => ({ ...prev, image: json.url }));
+      setFormData((prev) => ({ ...prev, thumbnail: json.url }));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Gagal mengunggah gambar";
       alert(msg);
@@ -94,7 +122,13 @@ export default function EditProjectPage({
       const res = await fetch(`/api/projects/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          longDesc: formData.longDesc || formData.shortDesc,
+          techStack: formData.tags,
+          thumbnail: formData.thumbnail,
+          revisionUsed: Math.max(0, Math.min(2, Number(formData.revisionUsed) || 0)),
+        }),
       });
 
       const json = await res.json();
@@ -170,8 +204,8 @@ export default function EditProjectPage({
             <textarea
               required
               rows={2}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              value={formData.shortDesc}
+              onChange={(e) => setFormData({ ...formData, shortDesc: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
             />
           </div>
@@ -184,8 +218,8 @@ export default function EditProjectPage({
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  value={formData.thumbnail}
+                  onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
                   className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
                 />
                 <label className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors">
@@ -195,9 +229,9 @@ export default function EditProjectPage({
                 </label>
               </div>
 
-              {formData.image && (
+              {formData.thumbnail && (
                 <div className="h-32 rounded-xl overflow-hidden border border-slate-800 relative bg-slate-950">
-                  <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={formData.thumbnail} alt="Preview" className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
@@ -247,8 +281,8 @@ export default function EditProjectPage({
             </label>
             <textarea
               rows={5}
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              value={formData.longDesc}
+              onChange={(e) => setFormData({ ...formData, longDesc: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
             />
           </div>

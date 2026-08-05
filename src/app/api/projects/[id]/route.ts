@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -31,6 +31,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const { id } = await params;
     const body = await req.json();
+    const existing = await prisma.project.findUnique({ where: { id } });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
 
     const updated = await prisma.project.update({
       where: { id },
@@ -44,7 +49,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         techStack: typeof body.techStack === "string" ? body.techStack : JSON.stringify(body.techStack || []),
         githubUrl: body.githubUrl,
         demoUrl: body.demoUrl,
-        client: body.client,
         year: body.year,
         duration: body.duration,
         category: body.category,
@@ -58,6 +62,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         screenshots: typeof body.screenshots === "string" ? body.screenshots : JSON.stringify(body.screenshots || []),
         videoDemo: body.videoDemo,
         seoImage: body.seoImage,
+        isActive: typeof body.isActive === "boolean" ? body.isActive : existing.isActive,
       },
     });
 

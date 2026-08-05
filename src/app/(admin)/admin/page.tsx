@@ -149,14 +149,6 @@ export default function AdminDashboardPage() {
           <p className="text-[10px] text-slate-500 mt-1">Leave Your Mark posts</p>
         </div>
 
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono mb-2">
-            <span>MEDIA</span>
-            <FolderOpen className="w-4 h-4 text-purple-400" />
-          </div>
-          <p className="text-3xl font-black text-white">{overview.totalMedia || 0}</p>
-          <p className="text-[10px] text-slate-500 mt-1">Files uploaded</p>
-        </div>
       </div>
 
       {/* Main Grid: Leave Your Mark Moderation & Recent Visitors */}

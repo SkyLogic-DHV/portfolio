@@ -38,6 +38,7 @@ function generateCaptcha() {
 export function ContactUsModal({ isOpen, onClose }: ContactUsProps) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
 
@@ -56,6 +57,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsProps) {
         if (isOpen) {
             setName("");
             setEmail("");
+            setPhone("");
             setSubject("");
             setMessage("");
             setCaptchaInput("");
@@ -105,6 +107,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsProps) {
                 body: JSON.stringify({
                     name: name.trim(),
                     email: email.trim(),
+                    phone: phone.trim(),
                     subject: subject.trim() || "New Contact Inquiry",
                     message: message.trim(),
                 }),
@@ -220,6 +223,21 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsProps) {
                                                 </div>
                                             </div>
 
+                                            {/* Phone */}
+                                            <div>
+                                                <label className="text-xs font-mono text-slate-500 uppercase mb-1.5 block">Phone Number</label>
+                                                <div className="relative">
+                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                    <input
+                                                        type="tel"
+                                                        value={phone}
+                                                        onChange={(e) => setPhone(e.target.value)}
+                                                        placeholder="+62 812 3456 7890"
+                                                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white placeholder:text-slate-600 text-sm focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                                                    />
+                                                </div>
+                                            </div>
+
                                             {/* Subject */}
                                             <div>
                                                 <label className="text-xs font-mono text-slate-500 uppercase mb-1.5 block">Subject</label>
@@ -273,7 +291,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsProps) {
                                                     <ShieldCheck className="w-7 h-7 text-amber-400" />
                                                 </div>
                                                 <h4 className="text-lg font-bold text-white">Security Verification</h4>
-                                                <p className="text-xs text-slate-500 mt-1">Solve the math problem to confirm you&apos;re human</p>
+                                                <p className="text-xs text-slate-500 mt-1">Solve the math problem to confirm you're human</p>
                                             </div>
 
                                             {/* Captcha challenge */}
@@ -405,7 +423,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsProps) {
                                             </motion.div>
                                             <h4 className="text-xl font-bold text-white">Message Sent!</h4>
                                             <p className="text-sm text-slate-400 max-w-xs mx-auto">
-                                                Thank you for reaching out. We&apos;ll get back to you as soon as possible.
+                                                Thank you for reaching out. We'll get back to you as soon as possible.
                                             </p>
                                             <button
                                                 onClick={onClose}

@@ -9,7 +9,6 @@ export interface Project {
   techStack: string;
   githubUrl: string;
   demoUrl: string;
-  client: string;
   year: string;
   duration: string;
   category: string;

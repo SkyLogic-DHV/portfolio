@@ -1,22 +1,31 @@
-import prisma from "./../../lib/utils/prisma";
-import type { LeaveYourMark } from "@prisma/client";
-import { Navbar } from "@/components/frontend/Navbar";
-import { HeroSection } from "@/components/frontend/HeroSection";
 import { AboutSection } from "@/components/frontend/AboutSection";
-import { ProjectsSection } from "@/components/frontend/ProjectsSection";
-import { TechStackSection } from "@/components/frontend/TechStackSection";
-import { ServicesSection } from "@/components/frontend/ServicesSection";
-import { LeaveYourMarkSection } from "@/components/frontend/LeaveYourMarkSection";
 import { ContactSection } from "@/components/frontend/ContactSection";
+import { HeroSection } from "@/components/frontend/HeroSection";
+import { LeaveYourMarkSection } from "@/components/frontend/LeaveYourMarkSection";
+import { Navbar } from "@/components/frontend/Navbar";
+import { ProjectsSection } from "@/components/frontend/ProjectsSection";
+import { ServicesSection } from "@/components/frontend/ServicesSection";
+import { TechStackSection } from "@/components/frontend/TechStackSection";
 import { VisitorTracker } from "@/components/frontend/VisitorTracker";
+import { prisma } from "@/lib/db";
+import type { LeaveYourMark } from "@prisma/client";
 
 export const revalidate = 0; // Always dynamic from database
 
 export default async function HomePage() {
-  let hero = await prisma.heroSection.findUnique({ where: { id: "default" } });
-  if (!hero) {
-    hero = await prisma.heroSection.create({ data: { id: "default" } });
-  }
+  const hero = {
+    title: "We Build From Scratch",
+    subtitle: "Innovative Software & Systems",
+    description: "SkyLogic creates high-performance web applications, mobile platforms, and custom software systems engineered to scale.",
+    ctaButton: "Explore Projects",
+    ctaLink: "#projects",
+    bgImage: "",
+    bgGradient: "from-slate-100 via-indigo-50 to-slate-200",
+    badge: "SKYLOGIC // ENTERPRISE SOFTWARE ARCHITECTURE",
+    partnerLogos: "[]",
+    socialLinks: "[]",
+    isOpenForProject: true,
+  };
 
   let teamInfo = await prisma.teamSectionInfo.findUnique({ where: { id: "default" } });
   if (!teamInfo) {
@@ -28,6 +37,7 @@ export default async function HomePage() {
   });
 
   const projects = await prisma.project.findMany({
+    where: { featured: true, isActive: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -94,6 +104,7 @@ export default async function HomePage() {
           </div>
         </footer>
       </div>
+
     </main>
   );
 }

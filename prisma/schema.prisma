@@ -13,6 +13,10 @@ model AdminUser {
   name      String?
   role      String   @default("ADMIN")
   deactive  Boolean  @default(false) // true = disabled admin account
+  createdById String?
+  createdBy   AdminUser? @relation("AdminCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAdmins AdminUser[] @relation("AdminCreatedBy")
+  clientProjects ClientProject[] // reverse relation for assigned projects
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -25,22 +29,6 @@ model OtpToken {
   used      Boolean  @default(false)
   attempts  Int      @default(0)
   createdAt DateTime @default(now())
-}
-
-model HeroSection {
-  id               String   @id @default("default")
-  title            String   @default("We Build From Scratch")
-  subtitle         String   @default("Innovative Software & Systems")
-  description      String   @default("SkyLogic creates high-performance web applications, mobile platforms, and custom software systems engineered to scale.")
-  ctaButton        String   @default("Explore Projects")
-  ctaLink          String   @default("#projects")
-  bgImage          String   @default("")
-  bgGradient       String   @default("from-slate-100 via-indigo-50 to-slate-200")
-  badge            String   @default("SKYLOGIC // ENTERPRISE SOFTWARE ARCHITECTURE")
-  partnerLogos     String   @default("[]")
-  socialLinks      String   @default("[]")
-  isOpenForProject Boolean  @default(true)
-  updatedAt        DateTime @updatedAt
 }
 
 model TeamMember {
@@ -77,7 +65,6 @@ model Project {
   techStack   String   @default("[]")
   githubUrl   String   @default("")
   demoUrl     String   @default("")
-  client      String   @default("")
   year        String   @default("2026")
   duration    String   @default("3 Months")
   category    String   @default("Website")
@@ -96,13 +83,29 @@ model Project {
   updatedAt   DateTime @updatedAt
 }
 
+model ClientProject {
+  id            String   @id @default(uuid())
+  title         String
+  clientName    String   @default("")
+  status        String   @default("To Do")
+  assignedAdminId String?
+  assignedAdmin AdminUser? @relation(fields: [assignedAdminId], references: [id], onDelete: SetNull)
+  orderedAt     DateTime?
+  completedAt   DateTime?
+  revisionUsed  Int      @default(0)
+  revisionLimit Int      @default(2)
+  expiresAt     DateTime?
+  priority      String   @default("Medium")
+  description   String   @default("")
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model TechStack {
   id           String   @id @default(uuid())
   name         String
-  icon         String   @default("")
-  color        String   @default("#6366F1")
-  level        String   @default("Expert")
-  category     String   @default("Framework")
+  image        String   @default("")
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true) // Switch to display/hide on public website
   createdAt    DateTime @default(now())

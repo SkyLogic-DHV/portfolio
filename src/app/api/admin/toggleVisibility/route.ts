@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/utils/prisma';
 import { requireAdmin } from '@/lib/admin';
+import { prisma } from '@/lib/db';
+import { NextResponse } from 'next/server';
 
 type ModelName = 'project' | 'techStack' | 'service' | 'leaveYourMark';
 

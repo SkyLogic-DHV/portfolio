@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export interface HeroData {
   title: string;
@@ -90,16 +90,15 @@ export function HeroSection({ hero }: { hero: HeroData }) {
             alignItems: "center",
           }}
         >
-          {/* ── CENTER: SkyLogic — positioned over the glowing cubes ── */}
+          {/* ── LEFT TOP: SkyLogic ── */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
             style={{
               position: "absolute",
-              left: "30%",
-              transform: "translateX(-50%)",
-              top: "60%",
+              left: 44,
+              top: 36,
               marginTop: "0",
               zIndex: 3,
               whiteSpace: "nowrap",
@@ -109,7 +108,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
+                fontSize: "clamp(1.8rem, 3vw, 2.5rem)",
                 fontWeight: 900,
                 color: "#ffffff",
                 letterSpacing: "-1px",
@@ -141,15 +140,15 @@ export function HeroSection({ hero }: { hero: HeroData }) {
             </div>
           </motion.div>
 
-          {/* ── RIGHT: We Build From Scratch ── */}
+          {/* ── RIGHT BOTTOM: We Build From Scratch ── */}
           <motion.div
             initial={{ opacity: 0, x: 32 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.25, ease: "easeOut" }}
             style={{
               position: "absolute",
-              right: 56,
-              top: 48,
+              right: 44,
+              bottom: 36,
               textAlign: "right",
             }}
           >
@@ -157,7 +156,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
               style={{
                 margin: 0,
                 lineHeight: 1.05,
-                fontSize: "clamp(2.4rem, 5.5vw, 4.2rem)",
+                fontSize: "clamp(1.9rem, 3.8vw, 2.9rem)",
                 fontWeight: 900,
                 letterSpacing: "-1.5px",
                 textShadow: "0 2px 24px rgba(0,0,0,0.5)",

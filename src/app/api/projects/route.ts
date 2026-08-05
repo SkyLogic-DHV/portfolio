@@ -1,7 +1,6 @@
+import { requireAdmin } from "@/lib/admin";
 import { NextResponse } from "next/server";
 import prisma from "../../../lib/utils/prisma";
-import { getAdminSession } from "@/lib/auth";
-import { requireAdmin } from "@/lib/admin";
 
 export async function GET(req: Request) {
   try {
@@ -49,12 +48,12 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     if (!body.title) {
-      return NextResponse.json(
-        { error: "Title is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
-    
+    if (!body.shortDesc) {
+      return NextResponse.json({ error: "Short description is required" }, { status: 400 });
+    }
+
     const slug =
       body.slug ||
       body.title
@@ -73,7 +72,6 @@ export async function POST(req: Request) {
         techStack: typeof body.techStack === "string" ? body.techStack : JSON.stringify(body.techStack || []),
         githubUrl: body.githubUrl || "",
         demoUrl: body.demoUrl || "",
-        client: body.client || "",
         year: body.year || "2026",
         duration: body.duration || "3 Months",
         category: body.category || "Website",
@@ -87,6 +85,7 @@ export async function POST(req: Request) {
         screenshots: typeof body.screenshots === "string" ? body.screenshots : JSON.stringify(body.screenshots || []),
         videoDemo: body.videoDemo || "",
         seoImage: body.seoImage || "",
+        isActive: typeof body.isActive === "boolean" ? body.isActive : true,
       },
     });
 
