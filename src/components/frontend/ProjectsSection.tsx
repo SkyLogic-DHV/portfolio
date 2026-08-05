@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,12 +32,8 @@ export interface ProjectData {
 const CATEGORIES = [
   "All",
   "Website",
-  "Mobile",
-  "AI",
-  "Cyber Security",
+  "Website Application",
   "UI/UX",
-  "Automation",
-  "Internal Tools",
 ];
 
 export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
@@ -134,9 +130,10 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                   height="100%"
                   borderColor={colorConfig.border}
                   borderBgColor="var(--border-bg-color)"
-                  cardBgColor="var(--card-bg-color)"
-                  shadowColor="var(--shadow-color)"
-                  textColor="var(--text-color)"
+                  cardBgColor="#ffffff"
+                  shadowColor="rgba(2,6,23,0.06)"
+                  boxShadow="0 8px 24px rgba(15,23,42,0.08)"
+                  textColor="#0f172a"
                   hoverTextColor={colorConfig.hover}
                   fontFamily="var(--font-family)"
                   rtlFontFamily="var(--rtl-font-family)"
@@ -154,107 +151,92 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
       {/* Modal Detail Project */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-gray-900/60 backdrop-blur-md">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-2xl text-gray-700"
+              initial={{ opacity: 0, y: 80 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 80 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative w-full max-w-[1200px] h-[92vh] bg-white border border-gray-200 rounded-2xl shadow-2xl text-gray-700 overflow-hidden flex flex-col sm:flex-row"
             >
-              <button
-                onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={() => setSelectedProject(null)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors z-50">
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="flex items-center space-x-3 mb-4">
-                <span className="px-3 py-1 rounded bg-indigo-50 border border-indigo-200 text-xs font-mono text-indigo-700">
-                  {selectedProject.category}
-                </span>
-                <span className="text-xs text-gray-500">{selectedProject.year}</span>
-                <span className="text-xs text-gray-500">• {selectedProject.duration}</span>
+              {/* Left: large scrollable images */}
+              <div className="w-full sm:w-2/3 h-full overflow-y-auto hide-scrollbar bg-gray-50 p-4">
+                <div className="space-y-4">
+                  {(() => {
+                    let gallery: string[] = [];
+                    try {
+                      gallery = JSON.parse(selectedProject.gallery || "[]");
+                    } catch {
+                      gallery = [];
+                    }
+                    if (gallery.length === 0) {
+                      return (
+                        <div className="w-full h-[60vh] flex items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-sm text-gray-500">
+                          No gallery images uploaded.
+                        </div>
+                      );
+                    }
+
+                    return gallery.map((g, i) => (
+                      <div key={i} className="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
+                        <img src={g} alt={`${selectedProject.title} ${i}`} className="w-full h-[60vh] object-contain bg-black" />
+                      </div>
+                    ));
+                  })()}
+                </div>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                {selectedProject.title}
-              </h2>
-
-              <img
-                src={selectedProject.thumbnail}
-                alt={selectedProject.title}
-                className="w-full h-64 object-cover rounded-xl border border-gray-200 mb-6"
-              />
-
-              <div className="space-y-6 text-sm text-gray-600">
+              {/* Right: static details (not scrollable) */}
+              <div className="w-full sm:w-1/3 h-full p-6 bg-black text-white flex flex-col justify-between">
                 <div>
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-gray-400 mb-1">
-                    Overview
-                  </h4>
-                  <p className="leading-relaxed">{selectedProject.longDesc}</p>
-                </div>
-
-                {selectedProject.challenge && (
-                  <div>
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-amber-600 mb-1">
-                      Challenge
-                    </h4>
-                    <p className="leading-relaxed">{selectedProject.challenge}</p>
+                  <div className="mb-3 text-xs text-slate-400">
+                    <span className="px-3 py-1 rounded bg-indigo-50/10 border border-indigo-200 text-xs font-mono text-indigo-300">{selectedProject.category}</span>
+                    <span className="ml-3 text-xs text-slate-400">{selectedProject.year} • {selectedProject.duration}</span>
                   </div>
-                )}
 
-                {selectedProject.solution && (
-                  <div>
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-sky-600 mb-1">
-                      Solution
-                    </h4>
-                    <p className="leading-relaxed">{selectedProject.solution}</p>
+                  <h2 className="text-3xl font-bold text-white mb-4">{selectedProject.title}</h2>
+
+                  <div className="prose prose-sm max-w-none text-slate-300">
+                    <p>{selectedProject.longDesc || selectedProject.shortDesc}</p>
                   </div>
-                )}
 
-                {selectedProject.result && (
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-emerald-700 flex items-center space-x-2 mb-1">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Impact & Result</span>
-                    </h4>
-                    <p className="text-emerald-800 leading-relaxed">{selectedProject.result}</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  {selectedProject.githubUrl && (
-                    <a
-                      href={selectedProject.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center space-x-2 text-xs font-semibold text-gray-600 hover:text-gray-900"
-                    >
-                      <GithubIcon className="w-4 h-4" />
-                      <span>Source Code</span>
-                    </a>
+                  {selectedProject.challenge && (
+                    <div className="mt-4">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">Challenge</h4>
+                      <p className="text-sm text-slate-300">{selectedProject.challenge}</p>
+                    </div>
                   )}
-                  {selectedProject.demoUrl && (
-                    <a
-                      href={selectedProject.demoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center space-x-2 text-xs font-semibold text-sky-600 hover:text-sky-500"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Live Demo</span>
-                    </a>
+
+                  {selectedProject.solution && (
+                    <div className="mt-4">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-sky-400 mb-1">Solution</h4>
+                      <p className="text-sm text-slate-300">{selectedProject.solution}</p>
+                    </div>
                   )}
                 </div>
 
-                <button
-                  onClick={() => setSelectedProject(null)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700"
-                >
-                  Close
-                </button>
+                <div className="mt-6 flex flex-col gap-4">
+                  <div className="flex items-center space-x-3">
+                    {selectedProject.githubUrl && (
+                      <a href={selectedProject.githubUrl} target="_blank" rel="noreferrer" className="inline-flex items-center space-x-2 text-sm font-semibold text-white/90 hover:text-white">
+                        <GithubIcon className="w-4 h-4" />
+                        <span>Source Code</span>
+                      </a>
+                    )}
+                  </div>
+                  <a
+                    href={selectedProject.demoUrl || '#'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-semibold text-white"
+                  >
+                    Visit
+                  </a>
+                </div>
               </div>
             </motion.div>
           </div>
