@@ -1,26 +1,29 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { RefreshCw, Sparkles, GripVertical } from "lucide-react";
+import { RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export interface TechStackItem {
   id: string;
   name: string;
-  icon: string;
-  color: string;
-  level: string;
-  category: string;
+  image: string | null;
   displayOrder: number;
   isActive: boolean;
 }
 
 export function TechStackSection({ items }: { items: TechStackItem[] }) {
-  const [stackItems, setStackItems] = useState<TechStackItem[]>(items);
+  const initialItems = items.filter((item) => item.isActive !== false);
+  const [stackItems, setStackItems] = useState<TechStackItem[]>(initialItems);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    setStackItems(initialItems);
+  }, [items]);
+
   const handleReset = () => {
-    setStackItems([...items]);
+    setStackItems(initialItems);
+    setDraggedIndex(null);
   };
 
   const handleDragStart = (index: number) => {
@@ -29,12 +32,13 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
 
   const handleDragOver = (index: number) => {
     if (draggedIndex === null || draggedIndex === index) return;
-    const newItems = [...stackItems];
-    const draggedItem = newItems[draggedIndex];
-    newItems.splice(draggedIndex, 1);
-    newItems.splice(index, 0, draggedItem);
+
+    const nextItems = [...stackItems];
+    const draggedItem = nextItems[draggedIndex];
+    nextItems.splice(draggedIndex, 1);
+    nextItems.splice(index, 0, draggedItem);
     setDraggedIndex(index);
-    setStackItems(newItems);
+    setStackItems(nextItems);
   };
 
   const handleDragEnd = () => {
@@ -45,74 +49,62 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
     <section id="stack" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-          Our Engineering Stack & Toolkit
+          Our Engineering Stack
         </h2>
         <p className="mt-4 text-base text-gray-500">
-          Battle-tested frameworks, cloud infrastructure, and modern developer tools. Drag cards to reorder the stack matrix.
+          Logos and tools we use to build fast, reliable products from scratch.
         </p>
       </div>
 
-      {/* Single Large Container Box */}
-      <div className="relative bg-white border border-gray-200 rounded-3xl p-6 sm:p-10 shadow-xl min-h-[480px] flex flex-col justify-between overflow-hidden">
-        {/* Background Decor */}
-        <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-50 pointer-events-none" />
-
-        {/* Top Bar */}
-        <div className="relative z-10 flex items-center justify-between pb-6 mb-6 border-b border-gray-200">
+      <div className="relative bg-white/80 backdrop-blur-sm border border-gray-200/80 rounded-3xl p-3 sm:p-4 shadow-xl overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(226,232,240,0.55)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,0.55)_1px,transparent_1px)] bg-size-[24px_24px] pointer-events-none opacity-70" />
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-5 h-5 text-indigo-500" />
-            <h3 className="text-lg font-bold text-gray-900">Engineering Stack Matrix</h3>
-            <span className="text-xs font-mono text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
-              {stackItems.length} Tech Items
+            <span className="text-[10px] font-mono text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
+              {stackItems.length} Items
             </span>
           </div>
 
           <button
             onClick={handleReset}
-            className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs shadow-sm border border-gray-200 flex items-center space-x-2 transition-all cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-[10px] shadow-sm border border-gray-200 flex items-center space-x-2 transition-all cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Reset Order</span>
+            <RefreshCw className="w-3 h-3 text-indigo-500" />
+            <span>Reset</span>
           </button>
         </div>
 
-        {/* Grid of Cards */}
-        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {stackItems.map((item, idx) => (
+        <div className="relative z-10 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5 justify-items-start">
+          {stackItems.map((item, index) => (
             <motion.div
               key={item.id}
-              layout
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, delay: index * 0.03 }}
               draggable
-              onDragStart={() => handleDragStart(idx)}
+              onDragStart={() => handleDragStart(index)}
               onDragOver={(e) => {
                 e.preventDefault();
-                handleDragOver(idx);
+                handleDragOver(index);
               }}
               onDragEnd={handleDragEnd}
-              className={`group relative bg-white border rounded-2xl p-4 hover:bg-gray-50 shadow-sm cursor-grab active:cursor-grabbing transition-colors duration-200 flex flex-col justify-between select-none ${
-                draggedIndex === idx ? "border-indigo-500 bg-gray-50 opacity-60 scale-95" : "border-gray-200"
+              className={`group relative w-20 sm:w-24 rounded-md border bg-white/85 backdrop-blur-sm shadow-sm overflow-visible transition-all cursor-grab active:cursor-grabbing select-none ${
+                draggedIndex === index ? "opacity-60 scale-[0.98] border-indigo-500" : "border-gray-200"
               }`}
             >
-              <div className="flex items-center justify-between pointer-events-none mt-2">
-                <span
-                  className="w-3 h-3 rounded-full shadow-sm"
-                  style={{ backgroundColor: item.color || "#6366F1" }}
-                />
-                <div className="flex items-center space-x-1">
-                  <span className="text-[9px] font-mono text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded">
-                    {item.category}
-                  </span>
-                  <GripVertical className="w-3 h-3 text-gray-400 group-hover:text-gray-600" />
-                </div>
+              <div className="relative aspect-square w-full rounded-md border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden">
+                {item.image ? (
+                  <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1 transition-transform duration-300 group-hover:scale-[1.02]" />
+                ) : (
+                  <span className="text-[8px] text-gray-400">Logo</span>
+                )}
               </div>
 
-              <div className="mt-4 pointer-events-none">
-                <p className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+              <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-[-110%] transition-all duration-200 z-20">
+                <div className="whitespace-nowrap rounded-md bg-gray-950 px-2 py-1 text-[8px] font-semibold text-white shadow-lg shadow-black/20">
                   {item.name}
-                </p>
-                <p className="text-[10px] font-mono text-indigo-600 mt-0.5">
-                  {item.level}
-                </p>
+                </div>
               </div>
             </motion.div>
           ))}

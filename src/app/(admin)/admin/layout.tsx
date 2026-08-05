@@ -1,38 +1,34 @@
 "use client";
 
+import {
+    BarChart3,
+    Bell,
+    Briefcase,
+    ClipboardList,
+    Code2,
+    Globe,
+    Layers,
+    LayoutDashboard,
+    LogOut,
+    Menu,
+    Pin,
+    Search,
+    Settings,
+    User,
+    Users,
+    X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import {
-  LayoutDashboard,
-  Sparkles,
-  Users,
-  Briefcase,
-  Layers,
-  Code2,
-  FolderOpen,
-  Mail,
-  Pin,
-  BarChart3,
-  Globe,
-  Settings,
-  User,
-  LogOut,
-  Search,
-  Bell,
-  Menu,
-  X,
-} from "lucide-react";
+import { useEffect, useState } from "react";
 
 const MENU_ITEMS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Hero", href: "/admin/hero", icon: Sparkles },
-  { name: "About Team", href: "/admin/team", icon: Users },
+  { name: "Add Admin", href: "/admin/team", icon: Users },
   { name: "Projects", href: "/admin/projects", icon: Briefcase },
+  { name: "Client", href: "/admin/client", icon: ClipboardList },
   { name: "Services", href: "/admin/services", icon: Layers },
   { name: "Stack", href: "/admin/stack", icon: Code2 },
-  { name: "Media", href: "/admin/media", icon: FolderOpen },
-  { name: "Contact", href: "/admin/contact", icon: Mail },
   { name: "Leave Your Mark", href: "/admin/leave-your-mark", icon: Pin },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "SEO", href: "/admin/seo", icon: Globe },

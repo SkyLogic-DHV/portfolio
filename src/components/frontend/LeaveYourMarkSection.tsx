@@ -69,9 +69,23 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
   const [submitting, setSubmitting] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const handleReset = () => {
-    setNotes([...initialNotes]);
+    // Reset order based on initial notes, but keep all notes (including newly added ones)
+    const initialIds = new Set(initialNotes.map(n => n.id));
+    
+    // Separate initial notes and new notes
+    const initialOrdered: StickyNote[] = initialNotes
+      .map(n => notes.find(current => current.id === n.id))
+      .filter((note): note is StickyNote => note !== undefined);
+    
+    const newNotes = notes.filter(n => !initialIds.has(n.id));
+    
+    // Combine: initial notes in original order, then new notes
+    setNotes([...initialOrdered, ...newNotes]);
+    setCurrentPage(1);
   };
 
   const handleDragStart = (index: number) => {
@@ -128,6 +142,7 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
       setNotes([data, ...notes]);
       setMessage("");
       setName("");
+      setCurrentPage(1);
       setStatusMsg({ type: "success", text: "Your note has been pinned to the board! 📍" });
     } catch (err: any) {
       setStatusMsg({ type: "error", text: err.message });
@@ -140,10 +155,6 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
     <section id="leave-your-mark" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-100 border border-amber-300 text-amber-700 text-xs font-semibold mb-3">
-          <PushPinIcon colorClass="bg-red-500" />
-          <span className="ml-1">COMMUNITY CORKBOARD</span>
-        </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
           Leave Your Mark
         </h2>
@@ -285,52 +296,78 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
               <p>Be the first to pin a note on our paper board!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative">
-              {notes.map((note, idx) => {
-                const colorConfig = COLOR_CLASSES[note.color] || COLOR_CLASSES["yellow"];
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative">
+                {notes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((note, idx) => {
+                  const colorConfig = COLOR_CLASSES[note.color] || COLOR_CLASSES["yellow"];
+                  const actualIndex = (currentPage - 1) * itemsPerPage + idx;
 
-                return (
-                  <motion.div
-                    key={note.id}
-                    layout
-                    draggable
-                    onDragStart={() => handleDragStart(idx)}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      handleDragOver(idx);
-                    }}
-                    onDragEnd={handleDragEnd}
-                    className={`relative rounded-2xl p-5 border cursor-grab active:cursor-grabbing transition-colors duration-200 select-none shadow-md ${colorConfig.bg} ${colorConfig.border} ${colorConfig.text} ${
-                      draggedIndex === idx ? "opacity-60 scale-95 border-indigo-500" : ""
-                    }`}
-                  >
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                      <PushPinIcon colorClass={colorConfig.pinHead} />
-                    </div>
-
-                    {note.isPinned && (
-                      <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-amber-500/20 text-[9px] font-mono font-bold text-amber-900 uppercase">
-                        Pinned
-                      </span>
-                    )}
-
-                    <p
-                      className="text-base font-semibold leading-snug mt-2 pointer-events-none"
-                      style={{ fontFamily: "'Caveat', 'Comic Sans MS', cursive, sans-serif" }}
+                  return (
+                    <motion.div
+                      key={note.id}
+                      layout
+                      draggable
+                      onDragStart={() => handleDragStart(actualIndex)}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        handleDragOver(actualIndex);
+                      }}
+                      onDragEnd={handleDragEnd}
+                      className={`relative rounded-2xl p-5 border cursor-grab active:cursor-grabbing transition-colors duration-200 select-none shadow-md ${colorConfig.bg} ${colorConfig.border} ${colorConfig.text} ${
+                        draggedIndex === actualIndex ? "opacity-60 scale-95 border-indigo-500" : ""
+                      }`}
                     >
-                      {note.message}
-                    </p>
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                        <PushPinIcon colorClass={colorConfig.pinHead} />
+                      </div>
 
-                    <div className="mt-4 pt-2 border-t border-black/10 flex items-center justify-between text-xs font-mono opacity-80 pointer-events-none">
-                      <span className="font-semibold">- {note.name}</span>
-                      <span className="text-[10px]">
-                        {new Date(note.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+                      {note.isPinned && (
+                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-amber-500/20 text-[9px] font-mono font-bold text-amber-900 uppercase">
+                          Pinned
+                        </span>
+                      )}
+
+                      <p
+                        className="text-base font-semibold leading-snug mt-2 pointer-events-none"
+                        style={{ fontFamily: "'Caveat', 'Comic Sans MS', cursive, sans-serif" }}
+                      >
+                        {note.message}
+                      </p>
+
+                      <div className="mt-4 pt-2 border-t border-black/10 flex items-center justify-between text-xs font-mono opacity-80 pointer-events-none">
+                        <span className="font-semibold">- {note.name}</span>
+                        <span className="text-[10px]">
+                          {new Date(note.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Pagination */}
+              {notes.length > itemsPerPage && (
+                <div className="flex items-center justify-center space-x-2 mt-6">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-mono text-gray-600">
+                    Page {currentPage} of {Math.ceil(notes.length / itemsPerPage)}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(Math.ceil(notes.length / itemsPerPage), prev + 1))}
+                    disabled={currentPage === Math.ceil(notes.length / itemsPerPage)}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

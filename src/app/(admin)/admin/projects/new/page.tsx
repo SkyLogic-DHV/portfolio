@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { AlertCircle, ArrowLeft, Save, Upload } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, Save, Upload, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -16,12 +16,27 @@ export default function NewProjectPage() {
     title: "",
     slug: "",
     shortDesc: "",
-    content: "",
-    image: "",
+    longDesc: "",
+    thumbnail: "",
     demoUrl: "",
     githubUrl: "",
     tags: "Next.js,React,TypeScript",
     featured: false,
+    category: "Website",
+    client: "",
+    year: new Date().getFullYear().toString(),
+    duration: "3 Months",
+    highlight: "",
+    challenge: "",
+    solution: "",
+    result: "",
+    assignedAdminId: "",
+    orderedAt: new Date().toISOString().slice(0, 10),
+    completedAt: "",
+    revisionUsed: 0,
+    status: "In Progress",
+    isActive: true,
+    content: "",
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +74,13 @@ export default function NewProjectPage() {
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+              body: JSON.stringify({
+                ...formData,
+                thumbnail: formData.thumbnail,
+                longDesc: formData.longDesc || formData.shortDesc,
+                techStack: formData.tags,
+                revisionUsed: Math.max(0, Math.min(2, Number(formData.revisionUsed) || 0)),
+              }),
       });
 
       const json = await res.json();
@@ -149,8 +170,8 @@ export default function NewProjectPage() {
                 <input
                   type="text"
                   placeholder="https://images.unsplash.com/... atau /uploads/..."
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  value={formData.thumbnail}
+                  onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
                   className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
                 />
                 <label className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors">
@@ -160,9 +181,9 @@ export default function NewProjectPage() {
                 </label>
               </div>
 
-              {formData.image && (
+              {formData.thumbnail && (
                 <div className="h-32 rounded-xl overflow-hidden border border-slate-800 relative bg-slate-950">
-                  <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={formData.thumbnail} alt="Preview" className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
@@ -207,6 +228,23 @@ export default function NewProjectPage() {
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Client"
+              value={formData.client}
+              onChange={(e) => setFormData({ ...formData, client: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
+            />
+            <input
+              type="text"
+              placeholder="Assigned Admin ID"
+              value={formData.assignedAdminId}
+              onChange={(e) => setFormData({ ...formData, assignedAdminId: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
+            />
           </div>
 
           <div>

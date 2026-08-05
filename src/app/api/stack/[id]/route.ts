@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -16,11 +16,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       where: { id },
       data: {
         name: body.name,
-        icon: body.icon,
-        color: body.color,
-        level: body.level,
-        category: body.category,
-        displayOrder: Number(body.displayOrder),
+        image: body.image,
+        displayOrder: Number(body.displayOrder) || 0,
+        isActive: typeof body.isActive === "boolean" ? body.isActive : true,
       },
     });
 
