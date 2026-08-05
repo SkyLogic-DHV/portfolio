@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // RTL detection for Hebrew/Arabic
 function isRTL(text: string) {
@@ -51,7 +51,15 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   contentPadding = "10px 16px",
 }) => {
   const [hovered, setHovered] = useState(false);
+  const [flash, setFlash] = useState(false);
   const borderRef = useRef<HTMLDivElement>(null);
+  const flashTimeout = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (flashTimeout.current) window.clearTimeout(flashTimeout.current);
+    };
+  }, []);
 
   // Mouse movement for rotating border
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -86,7 +94,12 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     <div
       ref={borderRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => {
+        setHovered(true);
+        setFlash(true);
+        if (flashTimeout.current) window.clearTimeout(flashTimeout.current);
+        flashTimeout.current = window.setTimeout(() => setFlash(false), 220);
+      }}
       onMouseLeave={() => {
         setHovered(false);
         if (borderRef.current)
@@ -107,7 +120,11 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         justifyContent: "center",
         cursor: "pointer",
         userSelect: "none",
-        transition: "box-shadow 0.3s",
+        transition: "box-shadow 0.3s, transform 0.3s",
+        transform: hovered ? "translateY(-2px)" : "none",
+        boxShadow: hovered
+          ? `0 0 40px 10px ${hoverTextColor}`
+          : `0 16px 40px -22px ${shadowColor}`,
         position: "relative",
         fontFamily: effectiveFont,
       } as React.CSSProperties}
@@ -125,6 +142,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
           backgroundImage: pattern,
           backgroundSize: "20.84px 20.84px",
           padding: "0 0 8px 0",
+          position: "relative",
         }}
       >
         <div style={{ width: "100%", position: "relative", overflow: "hidden" }}>
@@ -136,6 +154,17 @@ export const InfoCard: React.FC<InfoCardProps> = ({
               height: "100%",
               objectFit: "cover",
               display: "block",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              opacity: flash ? 0.45 : 0,
+              background: `radial-gradient(circle at 25% 25%, rgba(255,255,255,0.85), transparent 35%), radial-gradient(circle at 75% 35%, rgba(255,255,255,0.55), transparent 20%)`,
+              transition: "opacity 0.25s ease-out",
+              mixBlendMode: "screen",
             }}
           />
         </div>

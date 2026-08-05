@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, CheckCircle2, Edit, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Briefcase, CheckCircle2, Edit, Plus, Sparkles, Trash2, X, Camera } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type ProjectRecord = {
@@ -8,6 +8,8 @@ type ProjectRecord = {
   title: string;
   slug: string;
   thumbnail?: string;
+  gallery?: string;
+  screenshots?: string;
   shortDesc?: string;
   longDesc?: string;
   category?: string;
@@ -47,6 +49,7 @@ function emptyForm() {
     solution: "",
     result: "",
     techStack: "",
+    gallery: "[]",
     screenshots: "[]",
     videoDemo: "",
     seoImage: "",
@@ -85,6 +88,15 @@ export default function AdminProjectsPage() {
     setFormOpen(true);
   };
 
+  async function uploadFile(file: File) {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: fd });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "Upload gagal");
+    return json.url as string;
+  }
+
   const openEditForm = (project: ProjectRecord) => {
     setEditingProjectId(project.id);
     setForm({
@@ -106,7 +118,8 @@ export default function AdminProjectsPage() {
       solution: project.solution || "",
       result: project.result || "",
       techStack: "",
-      screenshots: "[]",
+      gallery: project.gallery || "[]",
+      screenshots: project.screenshots || "[]",
       videoDemo: "",
       seoImage: "",
       isActive: project.isActive !== false,
@@ -124,6 +137,7 @@ export default function AdminProjectsPage() {
       const payload = {
         ...form,
         techStack: form.techStack,
+        gallery: form.gallery,
         screenshots: form.screenshots,
       };
 
@@ -210,49 +224,158 @@ export default function AdminProjectsPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Title"
-              required
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
-            />
-            <input
-              type="text"
-              placeholder="Slug"
-              value={form.slug}
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono"
-            />
-            <input
-              type="text"
-              placeholder="Thumbnail URL"
-              value={form.thumbnail}
-              onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
-            />
-            <select
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
-            >
-              <option value="Website">Website</option>
-              <option value="Mobile">Mobile</option>
-              <option value="AI">AI</option>
-              <option value="Cyber Security">Cyber Security</option>
-              <option value="UI/UX">UI/UX</option>
-              <option value="Automation">Automation</option>
-              <option value="Internal Tools">Internal Tools</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Highlight Badge"
-              value={form.highlight}
-              onChange={(e) => setForm({ ...form, highlight: e.target.value })}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white md:col-span-2"
-            />
+          <div className="grid grid-cols-1">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Left: scrollable gallery + upload */}
+              <div className="w-full md:w-1/2 max-h-[60vh] overflow-y-auto p-2 bg-slate-800 rounded-lg">
+                <div className="mb-3 text-xs text-slate-300">Detail images for the project popup. These appear in the project detail view and are separate from the card thumbnail.</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {(() => {
+                    let items: string[] = [];
+                    try {
+                      items = JSON.parse(form.gallery || "[]");
+                    } catch {
+                      items = [];
+                    }
+                    return items.length ? items.map((u, i) => (
+                      <div key={i} className="relative bg-slate-700 rounded overflow-hidden">
+                        {u.endsWith('.pdf') ? (
+                          <div className="p-4 text-xs text-white">PDF {i+1}</div>
+                        ) : (
+                          <img src={u} alt={`gallery-${i}`} className="w-full h-28 object-cover" />
+                        )}
+                        <button type="button" onClick={() => {
+                          let arr: string[] = [];
+                          try { arr = JSON.parse(form.gallery || "[]"); } catch { arr = []; }
+                          arr.splice(i,1);
+                          setForm(s => ({ ...s, gallery: JSON.stringify(arr) }));
+                        }} className="absolute top-1 right-1 bg-rose-600 text-white rounded-full p-1 text-xs">x</button>
+                      </div>
+                    )) : (
+                      <div className="col-span-2 text-xs text-slate-400">No gallery images yet. Upload below.</div>
+                    );
+                  })()}
+                </div>
+
+                <label className="mt-3 flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={async (e) => {
+                      const files = e.target.files;
+                      if (!files || files.length === 0) return;
+                      setSaving(true);
+                      try {
+                        const uploaded: string[] = [];
+                        for (let i = 0; i < files.length; i++) {
+                          const f = files[i];
+                          if (f.size > 500 * 1024 * 1024) {
+                            throw new Error(`File ${f.name} is larger than 500MB`);
+                          }
+                          // eslint-disable-next-line no-await-in-loop
+                          const url = await uploadFile(f);
+                          uploaded.push(url);
+                        }
+                        let existing: string[] = [];
+                        try { existing = JSON.parse(form.gallery || "[]"); } catch { existing = []; }
+                        setForm(s => ({ ...s, gallery: JSON.stringify([...existing, ...uploaded]) }));
+                      } catch (err) {
+                        console.error(err);
+                        setError(err instanceof Error ? err.message : 'Upload failed');
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <span className="px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs text-white">Upload images for detail</span>
+                </label>
+              </div>
+
+              {/* Right: static inputs (black background) */}
+              <div className="w-full md:w-1/2 bg-black p-4 rounded-lg text-white">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Title"
+                    required
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className="bg-transparent border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white md:col-span-2"
+                  />
+                  <div className="flex items-center gap-2 md:col-span-2">
+                    <input
+                      type="text"
+                      placeholder="Slug"
+                      value={form.slug}
+                      onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                      className="flex-1 bg-transparent border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2 md:col-span-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 h-16 bg-slate-700 rounded overflow-hidden flex items-center justify-center border border-slate-800">
+                        {form.thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={form.thumbnail} alt="thumbnail" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-xs text-slate-400 px-2">Card thumbnail preview</div>
+                        )}
+                      </div>
+                      <div className="text-xs text-slate-400">This image is used for the card thumbnail (single image).</div>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Thumbnail URL"
+                      value={form.thumbnail}
+                      onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+                      className="bg-transparent border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+                    />
+                    <label className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 cursor-pointer hover:bg-slate-700">
+                      <span>Upload Card Thumbnail</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const f = e.target.files && e.target.files[0];
+                          if (!f) return;
+                          try {
+                            setSaving(true);
+                            const url = await uploadFile(f);
+                            setForm((s) => ({ ...s, thumbnail: url }));
+                          } catch (err) {
+                            console.error(err);
+                            setError(err instanceof Error ? err.message : "Gagal upload gambar");
+                          } finally {
+                            setSaving(false);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="bg-transparent border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
+                  >
+                    <option value="Website" style={{ backgroundColor: "#000", color: "#fff" }}>Website</option>
+                    <option value="Website Application" style={{ backgroundColor: "#000", color: "#fff" }}>Website Application</option>
+                    <option value="UI/UX">UI/UX</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Highlight Badge"
+                    value={form.highlight}
+                    onChange={(e) => setForm({ ...form, highlight: e.target.value })}
+                    className="bg-transparent border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white md:col-span-2"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <textarea
@@ -348,9 +471,9 @@ export default function AdminProjectsPage() {
             />
             <input
               type="text"
-              placeholder="Screenshot JSON"
-              value={form.screenshots}
-              onChange={(e) => setForm({ ...form, screenshots: e.target.value })}
+              placeholder="Video demo URL"
+              value={form.videoDemo}
+              onChange={(e) => setForm({ ...form, videoDemo: e.target.value })}
               className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white"
             />
           </div>
@@ -398,21 +521,101 @@ export default function AdminProjectsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <div key={project.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-5">
-            <div>
-              <img
-                src={project.thumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"}
-                alt={project.title}
-                className="w-full h-36 object-cover rounded-xl border border-slate-800 mb-4"
-              />
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400">{project.category || "Website"}</span>
-                {project.featured && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 flex items-center gap-1"><Sparkles className="w-3 h-3" />Featured</span>}
-                {project.isActive === false && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700 text-slate-300">Hidden</span>}
+          <div key={project.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-5 relative">
+            {project.slug ? (
+              <div onClick={() => openEditForm(project)} className="block relative cursor-pointer">
+                <img
+                  src={project.thumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"}
+                  alt={project.title}
+                  className="w-full h-36 object-cover rounded-xl border border-slate-800 mb-4"
+                />
+                <div className="absolute top-3 right-3">
+                  <label className="flex items-center justify-center w-8 h-8 rounded-md bg-slate-800/70 hover:bg-slate-700 cursor-pointer">
+                    <Camera className="w-4 h-4 text-white" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const f = e.target.files && e.target.files[0];
+                        if (!f) return;
+                        try {
+                          setSaving(true);
+                          const url = await uploadFile(f);
+                          // update project thumbnail via API
+                          const res = await fetch(`/api/projects/${project.id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ thumbnail: url }),
+                          });
+                          if (!res.ok) throw new Error("Gagal memperbarui thumbnail");
+                          loadProjects();
+                        } catch (err) {
+                          console.error(err);
+                          setError(err instanceof Error ? err.message : "Upload gagal");
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400">{project.category || "Website"}</span>
+                  {project.featured && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 flex items-center gap-1"><Sparkles className="w-3 h-3" />Featured</span>}
+                  {project.isActive === false && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700 text-slate-300">Hidden</span>}
+                </div>
+                <h3 className="font-bold text-base text-white">{project.title}</h3>
+                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{project.shortDesc}</p>
               </div>
-              <h3 className="font-bold text-base text-white">{project.title}</h3>
-              <p className="text-xs text-slate-400 mt-1 line-clamp-2">{project.shortDesc}</p>
-            </div>
+            ) : (
+              <div className="block relative">
+                <img
+                  src={project.thumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"}
+                  alt={project.title}
+                  className="w-full h-36 object-cover rounded-xl border border-slate-800 mb-4 opacity-75"
+                />
+                <div className="absolute top-3 left-3 px-2 py-1 text-xs rounded bg-rose-600 text-white">No slug</div>
+                <div className="absolute top-3 right-3">
+                  <label className="flex items-center justify-center w-8 h-8 rounded-md bg-slate-800/70 hover:bg-slate-700 cursor-pointer">
+                    <Camera className="w-4 h-4 text-white" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const f = e.target.files && e.target.files[0];
+                        if (!f) return;
+                        try {
+                          setSaving(true);
+                          const url = await uploadFile(f);
+                          // update project thumbnail via API
+                          const res = await fetch(`/api/projects/${project.id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ thumbnail: url }),
+                          });
+                          if (!res.ok) throw new Error("Gagal memperbarui thumbnail");
+                          loadProjects();
+                        } catch (err) {
+                          console.error(err);
+                          setError(err instanceof Error ? err.message : "Upload gagal");
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400">{project.category || "Website"}</span>
+                  {project.featured && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 flex items-center gap-1"><Sparkles className="w-3 h-3" />Featured</span>}
+                  {project.isActive === false && <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700 text-slate-300">Hidden</span>}
+                </div>
+                <h3 className="font-bold text-base text-white">{project.title}</h3>
+                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{project.shortDesc}</p>
+              </div>
+            )}
 
             <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500">
