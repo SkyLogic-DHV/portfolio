@@ -1,8 +1,11 @@
 import { AboutSection } from "@/components/frontend/AboutSection";
 import { ContactSection } from "@/components/frontend/ContactSection";
 import { HeroSection } from "@/components/frontend/HeroSection";
+import { HowItWorksSection } from "@/components/frontend/HowItWorksSection";
 import { LeaveYourMarkSection } from "@/components/frontend/LeaveYourMarkSection";
 import { Navbar } from "@/components/frontend/Navbar";
+import { QuoteSection } from "@/components/frontend/QuoteSection";
+import { PricingSection } from "@/components/frontend/PricingSection";
 import { ProjectsSection } from "@/components/frontend/ProjectsSection";
 import { ServicesSection } from "@/components/frontend/ServicesSection";
 import { TechStackSection } from "@/components/frontend/TechStackSection";
@@ -81,11 +84,54 @@ export default async function HomePage() {
 
       <div className="relative z-10">
         <Navbar siteName={siteSettings.siteName} />
-        <HeroSection hero={hero} />
+
+        {/* Shared Background for Hero and Quote Sections */}
+        <div className="relative w-full">
+          <div
+            className="absolute inset-0 z-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(ellipse 85% 65% at 8% 8%, rgba(56, 189, 248, 0.15), transparent 60%),
+                radial-gradient(ellipse 75% 60% at 75% 35%, rgba(37, 99, 235, 0.1), transparent 62%),
+                radial-gradient(ellipse 70% 60% at 15% 80%, rgba(59, 130, 246, 0.15), transparent 62%),
+                radial-gradient(ellipse 70% 60% at 92% 92%, rgba(30, 58, 138, 0.12), transparent 62%),
+                linear-gradient(180deg, #ffffff 0%, #f4f8fc 50%, #eef6ff 100%)
+              `,
+            }}
+          />
+          <div className="relative z-10">
+            <HeroSection hero={hero} />
+            <QuoteSection />
+          </div>
+        </div>
+
         <ServicesSection services={services} />
+
         <ProjectsSection projects={projects} />
-        <TechStackSection items={techStack} />
-        <AboutSection info={teamInfo} members={teamMembers} />
+        {/* Unified Tech Stack & Pricing Section */}
+        <div className="relative w-full bg-white overflow-hidden border-y border-gray-100">
+          {/* Shared Wave Backgrounds - Varied */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {/* Left Waves */}
+            <svg className="absolute left-0 top-0 h-full w-[45%] max-w-[600px] text-[#2563EB]" viewBox="0 0 200 1600" preserveAspectRatio="none">
+              <path d="M0,0 L120,0 C60,300 180,500 80,800 C-20,1100 140,1300 90,1600 L0,1600 Z" fill="currentColor" opacity="0.02" />
+              <path d="M0,0 L80,0 C120,250 40,600 120,950 C180,1200 50,1400 110,1600 L0,1600 Z" fill="currentColor" opacity="0.03" />
+              <path d="M0,0 L150,0 C90,400 220,700 100,1050 C30,1250 180,1450 60,1600 L0,1600 Z" fill="currentColor" opacity="0.04" />
+            </svg>
+            
+            {/* Right Waves */}
+            <svg className="absolute right-0 top-0 h-full w-[45%] max-w-[600px] text-[#2563EB]" viewBox="0 0 200 1600" preserveAspectRatio="none">
+              <path d="M200,0 L80,0 C140,300 20,500 120,800 C220,1100 60,1300 110,1600 L200,1600 Z" fill="currentColor" opacity="0.02" />
+              <path d="M200,0 L120,0 C80,250 160,600 80,950 C20,1200 150,1400 90,1600 L200,1600 Z" fill="currentColor" opacity="0.03" />
+              <path d="M200,0 L50,0 C110,400 -20,700 100,1050 C170,1250 20,1450 140,1600 L200,1600 Z" fill="currentColor" opacity="0.04" />
+            </svg>
+          </div>
+          
+          <TechStackSection items={techStack} />
+          <PricingSection />
+        </div>
+        <HowItWorksSection />
+        {/* <AboutSection info={teamInfo} members={teamMembers} /> */}
         <LeaveYourMarkSection initialNotes={initialNotes} />
         <ContactSection contact={contact} />
 

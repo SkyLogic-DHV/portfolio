@@ -1,3 +1,5 @@
+import SplashScreen from "@/components/ui/splash-screen";
+
 export default function FrontendLayout({
   children,
 }: {
@@ -5,7 +7,7 @@ export default function FrontendLayout({
 }) {
   return (
     <div className="min-h-screen bg-white text-gray-900 antialiased">
-      {children}
+      <SplashScreen>{children}</SplashScreen>
     </div>
   );
 }

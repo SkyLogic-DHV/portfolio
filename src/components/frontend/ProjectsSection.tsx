@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Sparkles, X, CheckCircle2 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/BrandIcons";
-import { InfoCard } from "@/components/ui/info-card";
+import { WorkflowBuilderCard } from "@/components/ui/workflow-builder-card";
 
 export interface ProjectData {
   id: string;
@@ -46,13 +46,14 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
   });
 
   return (
-    <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="projects" className="py-20 w-full bg-[#0F172A]">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Title */}
       <div className="text-center max-w-3xl mx-auto mb-12">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
           Featured Engineering Projects
         </h2>
-        <p className="mt-4 text-base text-gray-500">
+        <p className="mt-4 text-base text-gray-400">
           Selected case studies built from scratch with high scale, security, and performance.
         </p>
       </div>
@@ -64,8 +65,8 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
             key={cat}
             onClick={() => setActiveCategory(cat)}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${activeCategory === cat
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
-                : "bg-gray-100 border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300"
+              ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25"
+              : "bg-white/5 border border-white/10 text-blue-100/60 hover:text-white hover:bg-white/10 hover:border-white/20"
               }`}
           >
             {cat}
@@ -84,11 +85,11 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
           }
 
           const colors = [
-            { border: "var(--border-color-1)", hover: "var(--hover-text-color-1)" },
-            { border: "var(--border-color-2)", hover: "var(--hover-text-color-2)" },
-            { border: "var(--border-color-3)", hover: "var(--hover-text-color-3)" },
+            { border: "#2563EB", hover: "#ffffff" }, // Blue 600
+            { border: "#1E3A8A", hover: "#ffffff" }, // Navy 700
+            { border: "#38BDF8", hover: "#0F172A" }, // Sky 400
           ];
-          
+
           const colorConfig = colors[index % colors.length];
 
           return (
@@ -101,7 +102,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
               onClick={() => setSelectedProject(project)}
               className="flex justify-center items-center w-full"
             >
-              <div 
+              <div
                 className="file-container w-full"
                 style={{
                   maxWidth: 388,
@@ -119,28 +120,20 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                   ["--hover-text-color" as any]: colorConfig.hover,
                 }}
               >
-                <InfoCard
-                  image={
+                <WorkflowBuilderCard
+                  imageUrl={
                     project.thumbnail ||
                     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
                   }
                   title={project.title}
-                  description={project.shortDesc}
-                  width="100%"
-                  height="100%"
-                  borderColor={colorConfig.border}
-                  borderBgColor="var(--border-bg-color)"
-                  cardBgColor="#ffffff"
-                  shadowColor="rgba(2,6,23,0.06)"
-                  boxShadow="0 8px 24px rgba(15,23,42,0.08)"
-                  textColor="#0f172a"
-                  hoverTextColor={colorConfig.hover}
-                  fontFamily="var(--font-family)"
-                  rtlFontFamily="var(--rtl-font-family)"
-                  effectBgColor={colorConfig.border}
-                  patternColor1="var(--pattern-color1)"
-                  patternColor2="var(--pattern-color2)"
-                  contentPadding="14.3px 16px"
+                  description={project.shortDesc || project.longDesc}
+                  status={project.status || "Active"}
+                  lastUpdated={project.year}
+                  tags={project.category ? [project.category] : []}
+                  actions={[
+                    ...(project.githubUrl ? [{ Icon: GithubIcon as any, bgColor: "bg-slate-800" }] : []),
+                    ...(project.demoUrl ? [{ Icon: ExternalLink as any, bgColor: "bg-[#2563EB]" }] : [])
+                  ]}
                 />
               </div>
             </motion.div>
@@ -182,8 +175,8 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                     }
 
                     return gallery.map((g, i) => (
-                      <div key={i} className="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
-                        <img src={g} alt={`${selectedProject.title} ${i}`} className="w-full h-[60vh] object-contain bg-black" />
+                      <div key={i} className="w-full bg-[#0B1220] rounded-lg overflow-hidden border border-gray-200">
+                        <img src={g} alt={`${selectedProject.title} ${i}`} className="w-full h-[60vh] object-contain bg-[#0B1220]" />
                       </div>
                     ));
                   })()}
@@ -191,10 +184,10 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
               </div>
 
               {/* Right: static details (not scrollable) */}
-              <div className="w-full sm:w-1/3 h-full p-6 bg-black text-white flex flex-col justify-between">
+              <div className="w-full sm:w-1/3 h-full p-6 bg-[#0B1220] text-white flex flex-col justify-between">
                 <div>
                   <div className="mb-3 text-xs text-slate-400">
-                    <span className="px-3 py-1 rounded bg-indigo-50/10 border border-indigo-200 text-xs font-mono text-indigo-300">{selectedProject.category}</span>
+                    <span className="px-3 py-1 rounded bg-[#38BDF8]/10 border border-[#38BDF8]/30 text-xs font-mono text-[#38BDF8]">{selectedProject.category}</span>
                     <span className="ml-3 text-xs text-slate-400">{selectedProject.year} • {selectedProject.duration}</span>
                   </div>
 
@@ -206,14 +199,14 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
 
                   {selectedProject.challenge && (
                     <div className="mt-4">
-                      <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">Challenge</h4>
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-[#38BDF8] mb-1">Challenge</h4>
                       <p className="text-sm text-slate-300">{selectedProject.challenge}</p>
                     </div>
                   )}
 
                   {selectedProject.solution && (
                     <div className="mt-4">
-                      <h4 className="text-xs font-mono uppercase tracking-wider text-sky-400 mb-1">Solution</h4>
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-[#38BDF8] mb-1">Solution</h4>
                       <p className="text-sm text-slate-300">{selectedProject.solution}</p>
                     </div>
                   )}
@@ -232,7 +225,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                     href={selectedProject.demoUrl || '#'}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-semibold text-white"
+                    className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#2563EB] hover:bg-[#3B82F6] text-sm font-semibold text-white transition-colors"
                   >
                     Visit
                   </a>
@@ -242,6 +235,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
           </div>
         )}
       </AnimatePresence>
+      </div>
     </section>
   );
 }

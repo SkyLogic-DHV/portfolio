@@ -24,7 +24,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
     <section
       style={{
         width: "100%",
-        background: "#ffffff",
+        background: "transparent",
         paddingTop: 96,
         paddingBottom: 32,
         paddingLeft: 24,
@@ -44,7 +44,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
           borderRadius: "20px 140px 20px 140px",
           overflow: "hidden",
           minHeight: 480,
-          background: "#0c1120",
+          background: "#0B1220",
           boxShadow: "0 32px 100px rgba(0,0,0,0.40)",
           display: "flex",
           alignItems: "stretch",
@@ -74,7 +74,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(90deg, rgba(12,17,32,0.85) 0%, rgba(12,17,32,0.10) 35%, rgba(12,17,32,0.10) 65%, rgba(12,17,32,0.80) 100%)",
+              "linear-gradient(90deg, rgba(11,18,32,0.85) 0%, rgba(11,18,32,0.10) 35%, rgba(11,18,32,0.10) 65%, rgba(11,18,32,0.80) 100%)",
             zIndex: 1,
           }}
         />
@@ -140,6 +140,8 @@ export function HeroSection({ hero }: { hero: HeroData }) {
             </div>
           </motion.div>
 
+          {/* Scroll to Pricing removed from here */}
+
           {/* ── RIGHT BOTTOM: We Build From Scratch ── */}
           <motion.div
             initial={{ opacity: 0, x: 32 }}
@@ -162,12 +164,67 @@ export function HeroSection({ hero }: { hero: HeroData }) {
                 textShadow: "0 2px 24px rgba(0,0,0,0.5)",
               }}
             >
-              <span style={{ color: "#38bdf8", display: "block" }}>We Build</span>
+              <span style={{ display: "block" }}>
+                <span style={{ color: "#38bdf8" }}>We </span>
+                <span style={{ color: "#ffffff" }}>Build</span>
+              </span>
               <span style={{ color: "#38bdf8", display: "block" }}>From</span>
               <span style={{ color: "#ffffff", display: "block" }}>Scratch</span>
             </h1>
           </motion.div>
         </div>
+      </motion.div>
+
+      {/* ── CENTER BOTTOM: Scroll to Pricing (Outside Hero Card) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "32px",
+        }}
+      >
+        <motion.a
+          href="#pricing"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+            textDecoration: "none",
+            color: "#64748b", // text-slate-500
+          }}
+          whileHover={{ color: "#0f172a", scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <span style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase" }}>
+            Lihat Harga
+          </span>
+          <div
+            style={{
+              width: 24,
+              height: 40,
+              border: "2px solid currentColor",
+              borderRadius: 12,
+              display: "flex",
+              justifyContent: "center",
+              paddingTop: 4,
+            }}
+          >
+            <motion.div
+              animate={{ y: [0, 14, 0], opacity: [1, 0.5, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                width: 4,
+                height: 6,
+                backgroundColor: "currentColor",
+                borderRadius: 2,
+              }}
+            />
+          </div>
+        </motion.a>
       </motion.div>
     </section>
   );
