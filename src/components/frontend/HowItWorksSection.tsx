@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, useInView } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const steps = [
@@ -80,25 +80,93 @@ const SketchyCircle = ({ color }: { color: string }) => (
   </svg>
 );
 
-export function HowItWorksSection() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+// Layout constants
+const CARD_W = 320;       // card width (matches w-[320px])
+const GAP = 24;           // gap between visible cards
+const STACK_OFFSET = 12;  // tiny offset between stacked cards
+const DEFAULT_OFFSET = 140; // default spacing in idle state (fills ~1300px with 8 cards)
+const VISIBLE_AFTER = 2;  // how many cards to show after the hovered one
+const RIGHT_STACK_X = (steps.length - 1) * DEFAULT_OFFSET; // initial right stacked position (~980px)
 
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -340, behavior: "smooth" });
+/**
+ * Calculate the X position for a card given the active (hovered/selected) index.
+ *
+ * Layout when card `h` is active:
+ *   Left stack:  cards 0..h       → tightly stacked at left
+ *   Visible:     cards h+1..h+2   → spread out to the right
+ *   Right stack: cards h+3..end   → tightly stacked at far right
+ */
+function getCardX(index: number, h: number | null): number {
+  // Idle state: evenly stacked with offset
+  if (h === null) return index * DEFAULT_OFFSET;
+
+  // Left stack (including the hovered card on top)
+  if (index <= h) {
+    return index * STACK_OFFSET;
+  }
+
+  // Visible cards after the hovered card
+  const visibleStart = CARD_W + GAP; // right after the left stack
+  if (index <= h + VISIBLE_AFTER) {
+    const visPos = index - h - 1; // 0 or 1
+    return visibleStart + visPos * (CARD_W + GAP);
+  }
+
+  // Right stack
+  const rightBase = visibleStart + VISIBLE_AFTER * (CARD_W + GAP);
+  const rightPos = index - h - VISIBLE_AFTER - 1;
+  return rightBase + rightPos * STACK_OFFSET;
+}
+
+/** Z-index: left stack ascending, visible cards high, right stack ascending */
+function getCardZ(index: number, h: number | null): number {
+  if (h === null) return index;
+  if (index <= h) return index; // hovered card is highest in left stack
+  if (index <= h + VISIBLE_AFTER) return 20 + index; // visible cards on top
+  return index; // right stack natural order
+}
+
+export function HowItWorksSection() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { amount: 0.25, once: false });
+  const [isEntering, setIsEntering] = useState(false);
+
+  useEffect(() => {
+    if (isInView) {
+      setIsEntering(true);
+      const timer = setTimeout(() => {
+        setIsEntering(false);
+      }, steps.length * 120 + 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setIsEntering(false);
+      setActiveIndex(null);
     }
+  }, [isInView]);
+
+  const handlePrev = () => {
+    setIsEntering(false);
+    setActiveIndex((prev) => {
+      if (prev === null) return steps.length - 1;
+      if (prev <= 0) return null;
+      return prev - 1;
+    });
   };
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 340, behavior: "smooth" });
-    }
+  const handleNext = () => {
+    setIsEntering(false);
+    setActiveIndex((prev) => {
+      if (prev === null) return 0;
+      if (prev >= steps.length - 1) return null;
+      return prev + 1;
+    });
   };
 
   return (
     <section className="py-20 w-full bg-white overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
@@ -111,68 +179,95 @@ export function HowItWorksSection() {
               Proses Transparan Menuju Website Impian Anda
             </p>
           </div>
-          
+
           {/* Navigation Arrows */}
           <div className="flex items-center space-x-3">
             <button
-              onClick={scrollLeft}
+              onClick={handlePrev}
               className="w-12 h-12 rounded-full bg-[#0B1220] flex items-center justify-center text-white hover:bg-[#1E3A8A] transition-colors shadow-lg"
-              aria-label="Scroll left"
+              aria-label="Previous card"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button
-              onClick={scrollRight}
+              onClick={handleNext}
               className="w-12 h-12 rounded-full bg-[#0B1220] flex items-center justify-center text-white hover:bg-[#1E3A8A] transition-colors shadow-lg"
-              aria-label="Scroll right"
+              aria-label="Next card"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
           </div>
         </div>
 
-        {/* Carousel Container */}
+        {/* Cards Container */}
         <div
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pt-4 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 hide-scrollbar cursor-grab active:cursor-grabbing"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          ref={containerRef}
+          className="relative w-full overflow-hidden"
+          style={{ height: 320 }}
+          onMouseLeave={() => setActiveIndex(null)}
         >
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`flex-none w-[320px] md:w-[360px] min-h-[280px] ${step.bgColor} rounded-[2rem] p-8 snap-start sticky group transition-transform shadow-xl border border-black/5`}
-              style={{
-                left: `calc(1rem + ${index * 40}px)`, // Offset each card so they stack
-                zIndex: index, // Ensure later cards stack on top of earlier cards
-              }}
-            >
-              {/* Number with Sketchy Circle */}
-              <div className="relative w-12 h-12 flex items-center justify-center mb-8">
-                <span className={`text-xl font-bold ${step.textColor} relative z-10`}>
-                  {step.id}
-                </span>
-                <SketchyCircle color="currentColor" />
-                <div className={`absolute inset-0 opacity-20 ${step.textColor}`} />
-              </div>
+          {steps.map((step, index) => {
+            const targetX = isInView
+              ? getCardX(index, activeIndex)
+              : index * STACK_OFFSET;
+            const targetOpacity = isInView ? 1 : 0;
+            const delay = isEntering ? index * 0.12 : 0;
 
-              {/* Title & Desc */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
-                {step.title}
-              </h3>
-              <p className="text-gray-700 font-medium leading-relaxed">
-                {step.desc}
-              </p>
+            return (
+              <motion.div
+                key={step.id}
+                className="absolute top-0 left-0"
+                initial={{
+                  x: index * STACK_OFFSET,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: targetX,
+                  opacity: targetOpacity,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 20,
+                  delay: delay,
+                }}
+                style={{
+                  zIndex: getCardZ(index, activeIndex),
+                }}
+                onMouseEnter={() => {
+                  setIsEntering(false);
+                  setActiveIndex(index);
+                }}
+              >
+                {/* Card item */}
+                <div
+                  className={`w-[320px] min-h-[280px] ${step.bgColor} rounded-[2rem] p-8 group shadow-xl border border-black/5 relative cursor-pointer`}
+                >
+                  {/* Number with Sketchy Circle */}
+                  <div className="relative w-12 h-12 flex items-center justify-center mb-8">
+                    <span className={`text-xl font-bold ${step.textColor} relative z-10`}>
+                      {step.id}
+                    </span>
+                    <SketchyCircle color="currentColor" />
+                    <div className={`absolute inset-0 opacity-20 ${step.textColor}`} />
+                  </div>
 
-              {/* Decorative faint icon at bottom right */}
-              <div className="absolute bottom-6 right-6 opacity-10 transform group-hover:scale-110 transition-transform duration-500">
-                <span className="text-8xl font-black">0{step.id}</span>
-              </div>
-            </motion.div>
-          ))}
+                  {/* Title & Desc */}
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-700 font-medium leading-relaxed">
+                    {step.desc}
+                  </p>
+
+                  {/* Decorative faint icon at bottom right */}
+                  <div className="absolute bottom-6 right-6 opacity-10 transform group-hover:scale-110 transition-transform duration-500">
+                    <span className="text-8xl font-black">0{step.id}</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
       </div>
