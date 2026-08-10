@@ -147,15 +147,30 @@ export function RulerCarousel({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isResetting]);
 
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Auto-play
+  useEffect(() => {
+    if (isResetting || isPaused) return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => prev + 1);
+    }, 2500); // 2.5 seconds auto-scroll
+    return () => clearInterval(interval);
+  }, [isResetting, isPaused]);
+
   const SPACING = 300; // Decreased spacing to fit more items
-  const centerPosition = 5; 
-  const targetX = -SPACING + (centerPosition - (activeIndex % itemsPerSet)) * SPACING;
+  const centerIndex = (infiniteItems.length - 1) / 2;
+  const targetX = (centerIndex - activeIndex) * SPACING;
 
   const currentPage = (activeIndex % itemsPerSet) + 1;
   const totalPages = itemsPerSet;
 
   return (
-    <div className="w-full flex flex-col items-center justify-center py-20 bg-transparent">
+    <div
+      className="w-full flex flex-col items-center justify-center py-20 bg-transparent"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div className="w-full h-[280px] flex flex-col justify-center relative">
         <div className="flex items-center justify-center">
           <RulerLines top />
@@ -171,11 +186,11 @@ export function RulerCarousel({
               isResetting
                 ? { duration: 0 }
                 : {
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 25,
-                    mass: 1,
-                  }
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 25,
+                  mass: 1,
+                }
             }
           >
             {infiniteItems.map((item, index) => {
@@ -185,11 +200,10 @@ export function RulerCarousel({
                 <motion.button
                   key={item.id}
                   onClick={() => handleItemClick(index)}
-                  className={`font-black whitespace-nowrap cursor-pointer flex items-center justify-center tracking-tighter ${
-                    isActive
+                  className={`font-black whitespace-nowrap cursor-pointer flex items-center justify-center tracking-tighter ${isActive
                       ? "text-[#0e2a47] dark:text-white drop-shadow-md"
                       : "text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400"
-                  }`}
+                    }`}
                   animate={{
                     scale: isActive ? 1 : 0.7,
                     opacity: isActive ? 1 : 0.4,
@@ -198,14 +212,14 @@ export function RulerCarousel({
                     isResetting
                       ? { duration: 0 }
                       : {
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 25,
-                        }
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }
                   }
                   style={{
                     width: "260px",
-                    fontSize: isActive ? "clamp(2rem, 4vw, 3.5rem)" : "clamp(1.5rem, 3vw, 2.5rem)",
+                    fontSize: isActive ? "clamp(1.2rem, 3vw, 2.2rem)" : "clamp(1rem, 2vw, 1.6rem)",
                   }}
                 >
                   {item.title}
@@ -219,7 +233,7 @@ export function RulerCarousel({
           <RulerLines top={false} />
         </div>
       </div>
-      
+
       <div className="flex items-center justify-center gap-6 mt-16">
         <button
           onClick={handlePrevious}

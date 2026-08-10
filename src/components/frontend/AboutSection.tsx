@@ -50,7 +50,7 @@ export function AboutSection({
               </span>
               <span className="text-6xl sm:text-7xl font-black tracking-tight text-gray-900">
                 L
-                <span className="inline-block w-5 h-5 rounded-full bg-amber-400 mx-1 shadow-[0_0_15px_#f59e0b40]" />
+                <span className="inline-block w-5 h-5 rounded-full bg-[#38BDF8] mx-1 shadow-[0_0_15px_#38BDF840]" />
                 gic
               </span>
             </div>

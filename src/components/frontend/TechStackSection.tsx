@@ -6,9 +6,14 @@ import { RulerCarousel, type CarouselItem } from "@/components/ui/ruler-carousel
 export interface TechStackItem {
   id: string;
   name: string;
-  image: string | null;
+  image: string;
+  color?: string;
+  category?: string;
+  level?: string;
   displayOrder: number;
   isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export function TechStackSection({ items }: { items: TechStackItem[] }) {
@@ -34,25 +39,22 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
   ];
 
   return (
-    <section id="tech-stack" className="py-28 bg-[#fafbfc] w-full overflow-hidden relative border-y border-gray-100">
-      {/* Subtle Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-      
+    <section id="tech-stack" className="pt-28 pb-10 w-full relative z-10">
       {/* Decorative Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[#0e2a47]/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[#0F172A]/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="max-w-[1100px] mx-auto px-6 mb-8 relative z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center"
         >
-          <span className="text-xs font-bold tracking-widest text-[#0e2a47] uppercase mb-4 bg-white px-5 py-2 rounded-full shadow-sm border border-gray-200">
+          <span className="text-xs font-bold tracking-widest text-[#1E3A8A] uppercase mb-4 bg-white px-5 py-2 rounded-full shadow-sm border border-gray-200">
             My Tech Stack
           </span>
-          <h2 className="text-[#0e2a47] text-4xl md:text-[46px] font-bold leading-[1.1] text-center tracking-tight max-w-xl">
+          <h2 className="text-[#0F172A] text-4xl md:text-[46px] font-bold leading-[1.1] text-center tracking-tight max-w-xl">
             Tools & Technologies
           </h2>
           <p className="text-gray-500 mt-5 text-center text-[15px] leading-relaxed max-w-lg mx-auto">
@@ -60,8 +62,8 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
           </p>
         </motion.div>
       </div>
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}

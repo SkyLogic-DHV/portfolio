@@ -45,12 +45,12 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
 
           {/* Center Logo (Image 1 reference: SkyLogic with accent yellow dot) */}
           <Link href="/" className="flex items-center space-x-1 group">
-            <span className="text-2xl font-bold tracking-tight text-gray-800 group-hover:text-indigo-600 transition-colors">
+            <span className="text-2xl font-bold tracking-tight text-gray-800 group-hover:text-[#2563EB] transition-colors">
               Sky
             </span>
             <span className="relative text-2xl font-bold tracking-tight text-gray-800">
               L
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mx-0.5 animate-pulse" />
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#38BDF8] mx-0.5 animate-pulse" />
               gic
             </span>
           </Link>
@@ -73,9 +73,9 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
             {/* Language Switcher */}
             <button
               onClick={() => setLang(lang === "ID" ? "EN" : "ID")}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-300 text-xs font-semibold text-gray-700 hover:border-gray-400 transition-all"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-300 text-xs font-semibold text-gray-700 hover:border-gray-400 transition-all hover:text-[#2563EB]"
             >
-              <Globe className="w-3.5 h-3.5 text-amber-400" />
+              <Globe className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>{lang}</span>
             </button>
           </div>
@@ -86,12 +86,12 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
               onClick={() => setLang(lang === "ID" ? "EN" : "ID")}
               className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-gray-100 border border-gray-300 text-xs text-gray-700"
             >
-              <Globe className="w-3 h-3 text-amber-400" />
+              <Globe className="w-3 h-3 text-[#38BDF8]" />
               <span>{lang}</span>
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-gray-500 hover:text-gray-900"
+              className="p-2 text-gray-500 hover:text-[#2563EB]"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>

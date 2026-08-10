@@ -130,26 +130,37 @@ export function ContactSection({ contact }: ContactSectionProps) {
   };
 
   return (
-    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
-      <a
-        href={`https://wa.me/${(contact.whatsapp || "").replace(/[^0-9]/g, "")}`}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed right-5 bottom-5 z-50 inline-flex items-center gap-2 rounded-full bg-emerald-500 text-white px-4 py-3 shadow-2xl shadow-emerald-500/25 hover:scale-105 transition-transform"
-        aria-label="Chat on WhatsApp"
-      >
-        <MessageCircleMore className="w-5 h-5" />
-        <span className="text-sm font-semibold">WhatsApp</span>
-      </a>
+    <section id="contact" className="py-20 relative overflow-hidden bg-[#0B1220]">
+      {/* Hero Background Image */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/hero_bg.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-overlay"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B1220] via-[#0B1220]/80 to-[#0B1220] pointer-events-none" />
 
-      <div className="text-center max-w-3xl mx-auto mb-12">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-          Get In Touch With SkyLogic
-        </h2>
-        <p className="mt-4 text-base text-gray-500">
-          Have a project in mind or want to collaborate? Send us a message and we'll get back to you within 1-2 business days.
-        </p>
-      </div>
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+        <a
+          href={`https://wa.me/${(contact.whatsapp || "").replace(/[^0-9]/g, "")}`}
+          target="_blank"
+          rel="noreferrer"
+          className="fixed right-5 bottom-5 z-50 inline-flex items-center gap-2 rounded-full bg-emerald-500 text-white px-4 py-3 shadow-2xl shadow-emerald-500/25 hover:scale-105 transition-transform"
+          aria-label="Chat on WhatsApp"
+        >
+          <MessageCircleMore className="w-5 h-5" />
+          <span className="text-sm font-semibold">WhatsApp</span>
+        </a>
+
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+            Get In Touch With SkyLogic
+          </h2>
+          <p className="mt-4 text-base text-gray-400">
+            Have a project in mind or want to collaborate? Send us a message and we'll get back to you within 1-2 business days.
+          </p>
+        </div>
 
       <div className="max-w-3xl mx-auto">
         <div className="p-6 sm:p-10 rounded-[2rem] bg-white border border-gray-200 shadow-xl">
@@ -175,7 +186,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                         onChange={(e) => setName(e.target.value)}
                         required
                         placeholder="Your name"
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-sm"
                       />
                     </div>
                   </div>
@@ -190,7 +201,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         placeholder="email@example.com"
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-sm"
                       />
                     </div>
                   </div>
@@ -203,7 +214,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+62 812 3456 7890"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-sm"
                   />
                 </div>
 
@@ -217,14 +228,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
                       required
                       rows={5}
                       placeholder="Tell us about your project or inquiry..."
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm resize-none"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-sm resize-none"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 transition-all"
+                  className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#3B82F6] text-white font-semibold text-sm shadow-lg shadow-[#2563EB]/25 transition-all"
                 >
                   <span>Continue</span>
                   <Send className="w-4 h-4" />
@@ -263,7 +274,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                         setCaptchaVerified(false);
                       }}
                       placeholder="Your answer"
-                      className="flex-1 px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-600/60 text-white text-center text-lg font-bold placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                      className="flex-1 px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-600/60 text-white text-center text-lg font-bold placeholder:text-slate-600 focus:outline-none focus:border-[#2563EB]/60 focus:ring-1 focus:ring-[#2563EB]/30 transition-all"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -331,7 +342,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                       type="button"
                       onClick={handleSendEmail}
                       disabled={loading}
-                      className="flex-1 py-3.5 rounded-xl bg-linear-to-r from-indigo-500 via-indigo-600 to-sky-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+                      className="flex-1 py-3.5 rounded-xl bg-linear-to-r from-[#3B82F6] via-[#2563EB] to-[#38BDF8] text-white font-semibold text-sm shadow-lg shadow-[#2563EB]/25 hover:shadow-[#2563EB]/40 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
                     >
                       <Send className="w-4 h-4" />
                       Send Message
@@ -349,7 +360,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 exit={{ opacity: 0 }}
                 className="py-12 text-center space-y-4"
               >
-                <Loader2 className="w-10 h-10 text-indigo-400 animate-spin mx-auto" />
+                <Loader2 className="w-10 h-10 text-[#38BDF8] animate-spin mx-auto" />
                 <p className="text-gray-900 font-semibold">Sending your message...</p>
                 <p className="text-xs text-gray-500">Please wait a moment</p>
               </motion.div>
@@ -427,6 +438,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             )}
           </AnimatePresence>
         </div>
+      </div>
       </div>
     </section>
   );
