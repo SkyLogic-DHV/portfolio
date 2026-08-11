@@ -2,19 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
 
-function parseFeatures(value: unknown): string[] {
-  if (Array.isArray(value)) return value;
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
-
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
@@ -25,24 +12,20 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const body = await req.json();
 
-    const updated = await prisma.service.update({
+    const updated = await prisma.publicService.update({
       where: { id },
       data: {
         title: body.title,
         description: body.description,
         icon: body.icon,
-        cta: body.cta,
-        price: body.price,
-        features: JSON.stringify(parseFeatures(body.features)),
-        popular: Boolean(body.popular),
         displayOrder: Number(body.displayOrder) || 0,
         isActive: typeof body.isActive === "boolean" ? body.isActive : true,
       },
     });
 
-    return NextResponse.json({ ...updated, features: parseFeatures(updated.features) });
+    return NextResponse.json(updated);
   } catch (error) {
-    console.error("Error updating service:", error);
+    console.error("Error updating public service:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -55,10 +38,10 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     }
 
     const { id } = await params;
-    await prisma.service.delete({ where: { id } });
+    await prisma.publicService.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting service:", error);
+    console.error("Error deleting public service:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

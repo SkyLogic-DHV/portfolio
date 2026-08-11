@@ -112,12 +112,26 @@ model TechStack {
   updatedAt    DateTime @updatedAt
 }
 
+model PublicService {
+  id           String   @id @default(uuid())
+  icon         String   @default("Code") // logo/ikon untuk card di web public
+  title        String
+  description  String
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true) // Switch to display/hide on public website
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Service {
   id           String   @id @default(uuid())
   icon         String   @default("Code")
   title        String
   description  String
   cta          String   @default("Learn More")
+  price        String   @default("") // Harga layanan (misal: "500K", "1.5M")
+  features     String   @default("[]") // JSON array berisi fitur/fitur unggulan
+  popular      Boolean  @default(false) // Paket yang paling direkomendasikan
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true) // Switch to display/hide on public website
   createdAt    DateTime @default(now())
@@ -189,5 +203,8 @@ model SiteSetting {
   ogImage         String   @default("")
   robots          String   @default("index, follow")
   sitemap         String   @default("https://skylogic.id/sitemap.xml")
+  pricingTag      String   @default("Transparent & Affordable")
+  pricingTitle    String   @default("Pricing Tailored to Your Needs")
+  pricingDescription String @default("Choose the plan that fits your vision. No hidden costs.")
   updatedAt       DateTime @updatedAt
 }

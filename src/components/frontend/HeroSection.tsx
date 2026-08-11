@@ -200,7 +200,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
           whileTap={{ scale: 0.95 }}
         >
           <span style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase" }}>
-            Lihat Harga
+            Packages & Pricing
           </span>
           <div
             style={{

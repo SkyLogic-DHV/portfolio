@@ -3,7 +3,6 @@ import { ContactSection } from "@/components/frontend/ContactSection";
 import { HeroSection } from "@/components/frontend/HeroSection";
 import { HowItWorksSection } from "@/components/frontend/HowItWorksSection";
 import { LeaveYourMarkSection } from "@/components/frontend/LeaveYourMarkSection";
-import { Navbar } from "@/components/frontend/Navbar";
 import { QuoteSection } from "@/components/frontend/QuoteSection";
 import { PricingSection } from "@/components/frontend/PricingSection";
 import { ProjectsSection } from "@/components/frontend/ProjectsSection";
@@ -45,11 +44,32 @@ export default async function HomePage() {
   });
 
   const techStack = await prisma.techStack.findMany({
+    where: { isActive: true },
     orderBy: { displayOrder: "asc" },
   });
 
-  const services = await prisma.service.findMany({
+  const publicServices = await prisma.publicService.findMany({
+    where: { isActive: true },
     orderBy: { displayOrder: "asc" },
+  });
+
+  const pricingServices = await prisma.service.findMany({
+    where: { isActive: true },
+    orderBy: { displayOrder: "asc" },
+  });
+  const normalizedServices = pricingServices.map((s) => {
+    let features: string[] = [];
+    if (Array.isArray((s as any).features)) {
+      features = (s as any).features;
+    } else if (typeof (s as any).features === "string") {
+      try {
+        const parsed = JSON.parse((s as any).features);
+        features = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        features = [];
+      }
+    }
+    return { ...s, features };
   });
 
   const notes = await prisma.leaveYourMark.findMany();
@@ -83,7 +103,7 @@ export default async function HomePage() {
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0 opacity-40" />
 
       <div className="relative z-10">
-        <Navbar siteName={siteSettings.siteName} />
+        {/* Navbar rendered globally in (frontend)/layout.tsx */}
 
         {/* Shared Background for Hero and Quote Sections */}
         <div className="relative w-full">
@@ -105,7 +125,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <ServicesSection services={services} />
+        <ServicesSection services={publicServices} />
 
         <ProjectsSection projects={projects} />
         {/* Unified Tech Stack & Pricing Section */}
@@ -128,7 +148,34 @@ export default async function HomePage() {
           </div>
           
           <TechStackSection items={techStack} />
-          <PricingSection />
+          <PricingSection
+            whatsapp={contact.whatsapp}
+            pricingTag={
+              !siteSettings.pricingTag || siteSettings.pricingTag.includes("Transparan")
+                ? "Transparent & Affordable"
+                : siteSettings.pricingTag
+            }
+            pricingTitle={
+              !siteSettings.pricingTitle || siteSettings.pricingTitle.includes("Layanan yang disesuaikan")
+                ? "Services Tailored to Your Needs"
+                : siteSettings.pricingTitle
+            }
+            pricingDescription={
+              !siteSettings.pricingDescription ||
+              siteSettings.pricingDescription.includes("Pilih layanan yang tepat")
+                ? "Choose the right service to realize your vision. No hidden costs."
+                : siteSettings.pricingDescription
+            }
+            services={normalizedServices.map((s) => ({
+              id: s.id,
+              name: s.title,
+              description: s.description,
+              price: s.price,
+              features: s.features,
+              popular: s.popular,
+              ctaText: s.cta || "Start Now",
+            }))}
+          />
         </div>
         <HowItWorksSection />
         {/* <AboutSection info={teamInfo} members={teamMembers} /> */}

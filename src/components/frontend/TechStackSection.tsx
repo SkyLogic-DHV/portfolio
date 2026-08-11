@@ -17,26 +17,10 @@ export interface TechStackItem {
 }
 
 export function TechStackSection({ items }: { items: TechStackItem[] }) {
-  // Using the hardcoded list requested by user
-  const originalItems: CarouselItem[] = [
-    { id: 1, title: "JavaScript" },
-    { id: 2, title: "TypeScript" },
-    { id: 3, title: "React" },
-    { id: 4, title: "Next.js" },
-    { id: 5, title: "Tailwind" },
-    { id: 6, title: "Bootstrap" },
-    { id: 7, title: "Node.js" },
-    { id: 8, title: "PostgreSQL" },
-    { id: 9, title: "MariaDB" },
-    { id: 10, title: "MySQL" },
-    { id: 11, title: "Supabase" },
-    { id: 12, title: "Express.js" },
-    { id: 13, title: "Prisma" },
-    { id: 14, title: "Git" },
-    { id: 15, title: "Figma" },
-    { id: 16, title: "Postman" },
-    { id: 17, title: "Vercel" },
-  ];
+  // Render tech names coming from the database (managed via admin Stack page)
+  const originalItems: CarouselItem[] = (items ?? [])
+    .filter((item) => item && (item as any).isActive !== false)
+    .map((item, index) => ({ id: index, title: item.name }));
 
   return (
     <section id="tech-stack" className="pt-28 pb-10 w-full relative z-10">
@@ -51,10 +35,10 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center"
         >
-          <span className="text-xs font-bold tracking-widest text-[#1E3A8A] uppercase mb-4 bg-white px-5 py-2 rounded-full shadow-sm border border-gray-200">
+          {/* <span className="text-xs font-bold tracking-widest text-[#1E3A8A] uppercase mb-4 bg-white px-5 py-2 rounded-full shadow-sm border border-gray-200">
             My Tech Stack
-          </span>
-          <h2 className="text-[#0F172A] text-4xl md:text-[46px] font-bold leading-[1.1] text-center tracking-tight max-w-xl">
+          </span> */}
+          <h2 className="text-[#0F172A] text-3xl sm:text-4xl font-bold leading-[1.1] text-center tracking-tight max-w-xl">
             Tools & Technologies
           </h2>
           <p className="text-gray-500 mt-5 text-center text-[15px] leading-relaxed max-w-lg mx-auto">

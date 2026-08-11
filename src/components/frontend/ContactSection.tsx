@@ -130,34 +130,27 @@ export function ContactSection({ contact }: ContactSectionProps) {
   };
 
   return (
-    <section id="contact" className="py-20 relative overflow-hidden bg-[#0B1220]">
-      {/* Hero Background Image */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/hero_bg.png"
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-overlay"
+    <section id="contact" className="py-20 relative overflow-hidden bg-white">
+      {/* Soft ambient gradient (kept light so it contrasts with the dark Leave Your Mark section above) */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 70% 55% at 10% 5%, rgba(56, 189, 248, 0.12), transparent 60%),
+            radial-gradient(ellipse 60% 50% at 90% 10%, rgba(37, 99, 235, 0.10), transparent 60%),
+            radial-gradient(ellipse 70% 60% at 50% 100%, rgba(59, 130, 246, 0.12), transparent 62%),
+            linear-gradient(180deg, #ffffff 0%, #f2f7fd 100%)
+          `,
+        }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B1220] via-[#0B1220]/80 to-[#0B1220] pointer-events-none" />
 
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
-        <a
-          href={`https://wa.me/${(contact.whatsapp || "").replace(/[^0-9]/g, "")}`}
-          target="_blank"
-          rel="noreferrer"
-          className="fixed right-5 bottom-5 z-50 inline-flex items-center gap-2 rounded-full bg-emerald-500 text-white px-4 py-3 shadow-2xl shadow-emerald-500/25 hover:scale-105 transition-transform"
-          aria-label="Chat on WhatsApp"
-        >
-          <MessageCircleMore className="w-5 h-5" />
-          <span className="text-sm font-semibold">WhatsApp</span>
-        </a>
 
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
             Get In Touch With SkyLogic
           </h2>
-          <p className="mt-4 text-base text-gray-400">
+          <p className="mt-4 text-base text-slate-600">
             Have a project in mind or want to collaborate? Send us a message and we'll get back to you within 1-2 business days.
           </p>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Sparkles, X, CheckCircle2 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/BrandIcons";
@@ -36,9 +36,30 @@ const CATEGORIES = [
   "UI/UX",
 ];
 
+import { createPortal } from "react-dom";
+
 export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ESC key + scroll lock when modal is open
+  useEffect(() => {
+    if (!selectedProject) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedProject(null);
+    };
+    document.addEventListener("keydown", handleKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [selectedProject]);
 
   const filteredProjects = projects.filter((p) => {
     if (activeCategory === "All") return true;
@@ -46,8 +67,20 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
   });
 
   return (
-    <section id="projects" className="py-20 w-full bg-[#0F172A]">
-      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="projects" className="relative py-20 w-full bg-[#0F172A] overflow-hidden">
+      {/* Vertical gradient backdrop */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            linear-gradient(180deg, rgba(37, 99, 235, 0.22) 0%, rgba(15, 23, 42, 0) 32%),
+            linear-gradient(0deg, rgba(30, 58, 138, 0.24) 0%, rgba(15, 23, 42, 0) 32%),
+            linear-gradient(180deg, #0F172A 0%, #0e1a2e 48%, #0B1220 100%)
+          `,
+        }}
+      />
+
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Title */}
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
@@ -121,6 +154,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                 }}
               >
                 <WorkflowBuilderCard
+                  onClick={() => setSelectedProject(project)}
                   imageUrl={
                     project.thumbnail ||
                     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
@@ -142,16 +176,21 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
       </div>
 
       {/* Modal Detail Project */}
-      <AnimatePresence>
-        {selectedProject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-gray-900/60 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, y: 80 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 80 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative w-full max-w-[1200px] h-[92vh] bg-white border border-gray-200 rounded-2xl shadow-2xl text-gray-700 overflow-hidden flex flex-col sm:flex-row"
+      {mounted && createPortal(
+        <AnimatePresence>
+          {selectedProject && (
+            <div
+              className="fixed inset-0 z-[80] flex items-center justify-center p-2 bg-gray-900/60 backdrop-blur-md"
+              onClick={() => setSelectedProject(null)}
             >
+              <motion.div
+                initial={{ opacity: 0, y: 80 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 80 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative w-full max-w-[1200px] h-[92vh] bg-white border border-gray-200 rounded-2xl shadow-2xl text-gray-700 overflow-hidden flex flex-col sm:flex-row"
+                onClick={(e) => e.stopPropagation()}
+              >
               <button onClick={() => setSelectedProject(null)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors z-50">
                 <X className="w-5 h-5" />
               </button>
@@ -167,7 +206,12 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                       gallery = [];
                     }
                     if (gallery.length === 0) {
-                      return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
                         <div className="w-full h-[60vh] flex items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-sm text-gray-500">
                           No gallery images uploaded.
                         </div>
@@ -222,7 +266,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                     )}
                   </div>
                   <a
-                    href={selectedProject.demoUrl || '#'}
+                    href={selectedProject.demoUrl || "#"}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#2563EB] hover:bg-[#3B82F6] text-sm font-semibold text-white transition-colors"
@@ -232,9 +276,11 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
                 </div>
               </div>
             </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
       </div>
     </section>
   );

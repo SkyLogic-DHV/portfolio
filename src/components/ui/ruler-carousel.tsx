@@ -200,9 +200,9 @@ export function RulerCarousel({
                 <motion.button
                   key={item.id}
                   onClick={() => handleItemClick(index)}
-                  className={`font-black whitespace-nowrap cursor-pointer flex items-center justify-center tracking-tighter ${isActive
-                      ? "text-[#0e2a47] dark:text-white drop-shadow-md"
-                      : "text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400"
+                  className={`font-black whitespace-nowrap cursor-pointer flex items-center justify-center tracking-tighter transition-colors ${isActive
+                      ? "text-black drop-shadow-md"
+                      : "text-gray-300 hover:text-gray-400"
                     }`}
                   animate={{
                     scale: isActive ? 1 : 0.7,

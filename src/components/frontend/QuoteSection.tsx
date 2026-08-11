@@ -69,7 +69,7 @@ export function QuoteSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-slate-600 mb-10 max-w-lg mx-auto leading-relaxed text-sm md:text-base"
         >
-          Kami memadukan desain UI/UX yang modern dengan arsitektur perangkat lunak yang handal. Dari website responsif hingga sistem web aplikasi yang kompleks, kami merancang solusi digital berkinerja tinggi yang disesuaikan khusus untuk kebutuhan bisnis Anda.
+          We collaborate UI/UX and software architecture to create high-performance digital solutions. From responsive websites to complex web applications, we design tailored solutions for your business needs.
         </motion.p>
 
         <motion.a
@@ -80,7 +80,7 @@ export function QuoteSection() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="bg-[#2563EB] text-white px-8 py-3.5 rounded-sm font-medium hover:bg-[#3B82F6] transition-colors tracking-wide text-sm"
         >
-          Mulai Proyek
+          Get in Touch
         </motion.a>
       </div>
 
