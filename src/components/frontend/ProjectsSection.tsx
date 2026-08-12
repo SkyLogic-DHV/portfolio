@@ -62,7 +62,26 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
     };
   }, [selectedProject]);
 
-  const filteredProjects = projects.filter((p) => {
+  const getYearNum = (yearStr?: string) => {
+    if (!yearStr) return 0;
+    const matches = yearStr.match(/\d{4}/g);
+    if (matches && matches.length > 0) {
+      return Math.max(...matches.map(Number));
+    }
+    const num = parseInt(yearStr, 10);
+    return isNaN(num) ? 0 : num;
+  };
+
+  const sortedProjects = [...projects].sort((a, b) => {
+    const yearA = getYearNum(a.year);
+    const yearB = getYearNum(b.year);
+    if (yearB !== yearA) {
+      return yearB - yearA;
+    }
+    return 0;
+  });
+
+  const filteredProjects = sortedProjects.filter((p) => {
     if (activeCategory === "All") return true;
     return p.category === activeCategory;
   });

@@ -40,7 +40,7 @@ export default async function HomePage() {
 
   const projects = await prisma.project.findMany({
     where: { featured: true, isActive: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ year: "desc" }, { createdAt: "desc" }],
   });
 
   const techStack = await prisma.techStack.findMany({
