@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Sparkles, X, CheckCircle2 } from "lucide-react";
+import { ExternalLink, Sparkles, X, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { GithubIcon } from "@/components/ui/BrandIcons";
 import { WorkflowBuilderCard } from "@/components/ui/workflow-builder-card";
 
@@ -42,6 +42,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -65,6 +66,78 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
     if (activeCategory === "All") return true;
     return p.category === activeCategory;
   });
+
+  const PER_PAGE = 3;
+  const pageCount = Math.ceil(filteredProjects.length / PER_PAGE);
+  const changeCategory = (cat: string) => {
+    setActiveCategory(cat);
+    setPage(0);
+  };
+
+  const renderProjectCard = (project: ProjectData, index: number) => {
+    let stackList: string[] = [];
+    try {
+      stackList = JSON.parse(project.techStack || "[]");
+    } catch {
+      stackList = [];
+    }
+
+    const colors = [
+      { border: "#2563EB", hover: "#ffffff" }, // Blue 600
+      { border: "#1E3A8A", hover: "#ffffff" }, // Navy 700
+      { border: "#38BDF8", hover: "#0F172A" }, // Sky 400
+    ];
+
+    const colorConfig = colors[index % colors.length];
+
+    return (
+      <motion.div
+        key={project.id}
+        layout
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, delay: index * 0.05 }}
+        onClick={() => setSelectedProject(project)}
+        className="flex justify-center items-center w-full"
+      >
+        <div
+          className="file-container w-full"
+          style={{
+            maxWidth: 388,
+            height: 378,
+            borderRadius: "1em",
+            position: "relative",
+            overflow: "hidden",
+            padding: 0,
+            cursor: "pointer",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "none",
+            boxSizing: "border-box",
+            ["--hover-text-color" as any]: colorConfig.hover,
+          }}
+        >
+          <WorkflowBuilderCard
+            onClick={() => setSelectedProject(project)}
+            imageUrl={
+              project.thumbnail ||
+              "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
+            }
+            title={project.title}
+            description={project.shortDesc || project.longDesc}
+            status={project.status || "Active"}
+            lastUpdated={project.year}
+            tags={project.category ? [project.category] : []}
+            actions={[
+              ...(project.githubUrl ? [{ Icon: GithubIcon as any, bgColor: "bg-slate-800" }] : []),
+              ...(project.demoUrl ? [{ Icon: ExternalLink as any, bgColor: "bg-[#2563EB]" }] : [])
+            ]}
+          />
+        </div>
+      </motion.div>
+    );
+  };
 
   return (
     <section id="projects" className="relative py-20 w-full bg-[#0F172A] overflow-hidden">
@@ -96,7 +169,7 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => changeCategory(cat)}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${activeCategory === cat
               ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25"
               : "bg-white/5 border border-white/10 text-blue-100/60 hover:text-white hover:bg-white/10 hover:border-white/20"
@@ -107,72 +180,51 @@ export function ProjectsSection({ projects }: { projects: ProjectData[] }) {
         ))}
       </div>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredProjects.map((project, index) => {
-          let stackList: string[] = [];
-          try {
-            stackList = JSON.parse(project.techStack || "[]");
-          } catch {
-            stackList = [];
-          }
+      {/* Projects Grid — max 3 per page */}
+      <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProjects.slice(page * PER_PAGE, (page + 1) * PER_PAGE).map((project, index) =>
+            renderProjectCard(project, page * PER_PAGE + index)
+          )}
+        </div>
 
-          const colors = [
-            { border: "#2563EB", hover: "#ffffff" }, // Blue 600
-            { border: "#1E3A8A", hover: "#ffffff" }, // Navy 700
-            { border: "#38BDF8", hover: "#0F172A" }, // Sky 400
-          ];
-
-          const colorConfig = colors[index % colors.length];
-
-          return (
-            <motion.div
-              key={project.id}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
-              onClick={() => setSelectedProject(project)}
-              className="flex justify-center items-center w-full"
+        {/* Arrow buttons at the ends + pagination dots below center */}
+        {pageCount > 1 && (
+          <>
+            <button
+              onClick={() => setPage(Math.max(0, page - 1))}
+              disabled={page === 0}
+              aria-label="Previous projects"
+              className="absolute -left-2 lg:-left-10 top-1/2 -translate-y-1/2 z-20 w-13 h-13 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-[0_8px_24px_rgba(37,99,235,0.4)] hover:bg-[#3B82F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <div
-                className="file-container w-full"
-                style={{
-                  maxWidth: 388,
-                  height: 378,
-                  borderRadius: "1em",
-                  position: "relative",
-                  overflow: "hidden",
-                  padding: 0,
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  background: "none",
-                  boxSizing: "border-box",
-                  ["--hover-text-color" as any]: colorConfig.hover,
-                }}
-              >
-                <WorkflowBuilderCard
-                  onClick={() => setSelectedProject(project)}
-                  imageUrl={
-                    project.thumbnail ||
-                    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
-                  }
-                  title={project.title}
-                  description={project.shortDesc || project.longDesc}
-                  status={project.status || "Active"}
-                  lastUpdated={project.year}
-                  tags={project.category ? [project.category] : []}
-                  actions={[
-                    ...(project.githubUrl ? [{ Icon: GithubIcon as any, bgColor: "bg-slate-800" }] : []),
-                    ...(project.demoUrl ? [{ Icon: ExternalLink as any, bgColor: "bg-[#2563EB]" }] : [])
-                  ]}
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+
+            <button
+              onClick={() => setPage(Math.min(pageCount - 1, page + 1))}
+              disabled={page >= pageCount - 1}
+              aria-label="Next projects"
+              className="absolute -right-2 lg:-right-10 top-1/2 -translate-y-1/2 z-20 w-13 h-13 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-[0_8px_24px_rgba(37,99,235,0.4)] hover:bg-[#3B82F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+
+            <div className="mt-10 flex items-center justify-center gap-2">
+              {Array.from({ length: pageCount }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPage(i)}
+                  aria-label={`Page ${i + 1}`}
+                  className={`h-2 rounded-full transition-all duration-200 ${
+                    i === page
+                      ? "w-6 bg-[#38BDF8] shadow shadow-[#38BDF8]/40"
+                      : "w-2 bg-white/25 hover:bg-white/50"
+                  }`}
                 />
-              </div>
-            </motion.div>
-          );
-        })}
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Modal Detail Project */}
