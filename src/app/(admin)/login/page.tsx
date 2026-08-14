@@ -94,14 +94,12 @@ export default function AdminLoginPage() {
         {/* Step Indicator */}
         <div className="flex items-center justify-center space-x-2 mb-8">
           <div
-            className={`w-8 h-1.5 rounded-full transition-all ${
-              step === "REQUEST" ? "bg-indigo-500 w-12" : "bg-slate-800"
-            }`}
+            className={`w-8 h-1.5 rounded-full transition-all ${step === "REQUEST" ? "bg-indigo-500 w-12" : "bg-slate-800"
+              }`}
           />
           <div
-            className={`w-8 h-1.5 rounded-full transition-all ${
-              step === "VERIFY" ? "bg-indigo-500 w-12" : "bg-slate-800"
-            }`}
+            className={`w-8 h-1.5 rounded-full transition-all ${step === "VERIFY" ? "bg-indigo-500 w-12" : "bg-slate-800"
+              }`}
           />
         </div>
 

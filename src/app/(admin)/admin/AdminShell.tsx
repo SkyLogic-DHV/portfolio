@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const MENU_ITEMS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -38,15 +38,48 @@ const MENU_ITEMS = [
   { name: "Profile", href: "/admin/profile", icon: User },
 ];
 
-export default function AdminShell({ children }: { children: React.ReactNode }) {
+interface AdminShellProps {
+  children: React.ReactNode;
+  session?: {
+    userId?: string;
+    username?: string;
+    email?: string;
+    role?: string;
+    name?: string;
+  } | null;
+}
+
+export default function AdminShell({ children, session }: AdminShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    // Double check authentication client-side to prevent cached/stale access
+    fetch("/api/auth/me")
+      .then((res) => {
+        if (!res.ok) {
+          router.replace("/login");
+        }
+      })
+      .catch(() => {
+        router.replace("/login");
+      });
+  }, [router]);
+
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
+
+  const displayName = session?.name || session?.username || "Admin";
+  const displayEmail = session?.email || "admin@skylogic.id";
+  const initialLetter = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-[#070A11] text-slate-100 flex font-sans">
@@ -89,11 +122,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                    isActive
+                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${isActive
                       ? "bg-indigo-600/90 text-white shadow-lg shadow-indigo-600/20"
                       : "text-slate-400 hover:text-white hover:bg-slate-900"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{item.name}</span>
@@ -106,20 +138,20 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         {/* User Info & Logout */}
         <div className="pt-4 border-t border-slate-800/80">
           <div className="flex items-center justify-between px-3 py-2">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-7 h-7 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-xs font-bold">
-                A
+            <div className="flex items-center space-x-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">
+                {initialLetter}
               </div>
               <div className="truncate">
-                <p className="text-xs font-bold text-white truncate">SuperAdmin</p>
-                <p className="text-[10px] text-slate-500 truncate">admin@skylogic.id</p>
+                <p className="text-xs font-bold text-white truncate">{displayName}</p>
+                <p className="text-[10px] text-slate-500 truncate">{displayEmail}</p>
               </div>
             </div>
 
             <button
               onClick={handleLogout}
               title="Logout"
-              className="p-1.5 text-slate-400 hover:text-rose-400 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-rose-400 transition-colors shrink-0"
             >
               <LogOut className="w-4 h-4" />
             </button>
