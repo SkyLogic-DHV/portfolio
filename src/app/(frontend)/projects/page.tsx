@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export default async function ProjectsPage() {
   const projects = await prisma.project.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ year: "desc" }, { createdAt: "desc" }],
   });
 
   return (

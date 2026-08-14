@@ -21,7 +21,7 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-md border-b border-gray-200 py-3 shadow-lg"
+          ? "bg-white border-b border-gray-200 py-3 shadow-sm"
           : "bg-transparent py-5"
       }`}
     >
@@ -43,14 +43,27 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
             </Link>
           </nav>
 
-          {/* Center Logo (Image 1 reference: SkyLogic with accent yellow dot) */}
+          {/* Center Logo (matching Hero section: Sky L ● gic with yellow glowing dot) */}
           <Link href="/" className="flex items-center space-x-1 group">
-            <span className="text-2xl font-bold tracking-tight text-gray-800 group-hover:text-[#2563EB] transition-colors">
+            <span
+              className="text-2xl font-extrabold tracking-tight text-gray-900 group-hover:text-[#2563EB] transition-colors"
+              style={{ letterSpacing: "-1px", lineHeight: 1 }}
+            >
               Sky
             </span>
-            <span className="relative text-2xl font-bold tracking-tight text-gray-800">
+            <span
+              className="relative inline-flex items-center text-2xl font-extrabold tracking-tight text-gray-900"
+              style={{ letterSpacing: "-1px", lineHeight: 1 }}
+            >
               L
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#38BDF8] mx-0.5 animate-pulse" />
+              <span
+                className="inline-block rounded-full bg-[#f5e642] mx-1 animate-pulse"
+                style={{
+                  width: "0.52em",
+                  height: "0.52em",
+                  boxShadow: "0 0 10px #f5e642cc, 0 0 22px #f5c30066",
+                }}
+              />
               gic
             </span>
           </Link>

@@ -40,6 +40,9 @@ export async function PUT(req: Request) {
         ogImage: body.ogImage,
         robots: body.robots,
         sitemap: body.sitemap,
+        pricingTag: body.pricingTag,
+        pricingTitle: body.pricingTitle,
+        pricingDescription: body.pricingDescription,
       },
       create: {
         id: "default",
@@ -56,6 +59,10 @@ export async function PUT(req: Request) {
         ogImage: body.ogImage || "",
         robots: body.robots || "index, follow",
         sitemap: body.sitemap || "https://skylogic.id/sitemap.xml",
+        pricingTag: body.pricingTag || "Transparent & Affordable",
+        pricingTitle: body.pricingTitle || "Pricing Tailored to Your Needs",
+        pricingDescription:
+          body.pricingDescription || "Choose the plan that fits your vision. No hidden costs.",
       },
     });
 

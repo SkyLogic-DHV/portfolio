@@ -172,11 +172,11 @@ export function HowItWorksSection() {
           <div>
             <div className="flex items-center space-x-3 mb-2">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                Langkah <span className="inline-block animate-bounce origin-bottom">🚀</span> Pengerjaan
+                How It Works
               </h2>
             </div>
             <p className="text-xl text-gray-600 font-medium tracking-tight">
-              Proses Transparan Menuju Website Impian Anda
+              Website development process from start to finish, ensuring clarity and transparency at every step.
             </p>
           </div>
 

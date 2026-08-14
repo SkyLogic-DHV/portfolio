@@ -70,7 +70,7 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
   const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 4;
 
   const handleReset = () => {
     // Reset order based on initial notes, but keep all notes (including newly added ones)
@@ -319,9 +319,9 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
                         handleDragOver(actualIndex);
                       }}
                       onDragEnd={handleDragEnd}
-                      className={`relative rounded-2xl p-5 border cursor-grab active:cursor-grabbing transition-colors duration-200 select-none shadow-md ${colorConfig.bg} ${colorConfig.border} ${colorConfig.text} ${draggedIndex === actualIndex ? "opacity-60 scale-95 border-[#2563EB]" : ""
+                      className={`relative rounded-2xl p-5 border cursor-grab active:cursor-grabbing transition-colors duration-200 select-none shadow-md min-h-[170px] flex flex-col ${colorConfig.bg} ${colorConfig.border} ${colorConfig.text} ${draggedIndex === actualIndex ? "opacity-60 scale-95 border-[#2563EB]" : ""
                         }`}
-                    >
+                  >
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
                         <PushPinIcon colorClass={colorConfig.pinHead} />
                       </div>
@@ -333,7 +333,7 @@ export function LeaveYourMarkSection({ initialNotes }: { initialNotes: StickyNot
                       )}
 
                       <p
-                        className="text-base font-semibold leading-snug mt-2 pointer-events-none"
+                        className="text-base font-semibold leading-snug mt-2 pointer-events-none break-words flex-1"
                         style={{ fontFamily: "'Caveat', 'Comic Sans MS', cursive, sans-serif" }}
                       >
                         {note.message}
