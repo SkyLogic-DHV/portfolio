@@ -3,7 +3,8 @@
 import { MessageCircleMore } from "lucide-react";
 
 export function WhatsAppButton({ whatsapp }: { whatsapp?: string }) {
-  const number = (whatsapp || "").replace(/[^0-9]/g, "");
+  const targetNumber = "+6281316881677";
+  const number = targetNumber.replace(/[^0-9]/g, "");
   const href = number ? `https://wa.me/${number}` : "#";
 
   return (

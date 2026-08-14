@@ -15,9 +15,10 @@ export interface PricingPlan {
 }
 
 function buildWhatsAppLink(whatsapp: string | undefined, planName: string) {
-  const number = (whatsapp || "").replace(/[^0-9]/g, "");
+  const targetNumber = "+6281316881677";
+  const number = targetNumber.replace(/[^0-9]/g, "");
   if (!number) return "#contact";
-  const message = `Halo saya ingin konsultasi mengenai paket ${planName}`;
+  const message = `Halo, saya ingin bertanya lebih lanjut mengenai paket ${planName}`;
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 

@@ -60,8 +60,8 @@ model Project {
   slug        String   @unique
   thumbnail   String   @default("")
   gallery     String   @default("[]")
-  shortDesc   String
-  longDesc    String
+  shortDesc   String   @db.Text
+  longDesc    String   @db.Text
   techStack   String   @default("[]")
   githubUrl   String   @default("")
   demoUrl     String   @default("")
@@ -72,9 +72,9 @@ model Project {
   featured    Boolean  @default(false)
   highlight   String   @default("")
   projectType String   @default("Enterprise")
-  challenge   String   @default("")
-  solution    String   @default("")
-  result      String   @default("")
+  challenge   String   @default("") @db.Text
+  solution    String   @default("") @db.Text
+  result      String   @default("") @db.Text
   screenshots String   @default("[]")
   videoDemo   String   @default("")
   seoImage    String   @default("")
@@ -141,7 +141,7 @@ model Service {
 model ContactInfo {
   id            String   @id @default("default")
   email         String   @default("contact@skylogic.id")
-  whatsapp      String   @default("+6281234567890")
+  whatsapp      String   @default("+6281316881677")
   instagram     String   @default("https://instagram.com/skylogic.id")
   linkedin      String   @default("https://linkedin.com/company/skylogic")
   github        String   @default("https://github.com/skylogic")
