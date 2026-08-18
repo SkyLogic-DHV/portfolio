@@ -23,7 +23,7 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
     .map((item, index) => ({ id: index, title: item.name }));
 
   return (
-    <section id="tech-stack" className="pt-28 pb-10 w-full relative z-10">
+    <section className="pt-28 pb-10 w-full relative z-10">
       {/* Decorative Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[#0F172A]/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -35,9 +35,6 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center"
         >
-          {/* <span className="text-xs font-bold tracking-widest text-[#1E3A8A] uppercase mb-4 bg-white px-5 py-2 rounded-full shadow-sm border border-gray-200">
-            My Tech Stack
-          </span> */}
           <h2 className="text-[#0F172A] text-3xl sm:text-4xl font-bold leading-[1.1] text-center tracking-tight max-w-xl">
             Tools & Technologies
           </h2>
@@ -47,12 +44,14 @@ export function TechStackSection({ items }: { items: TechStackItem[] }) {
         </motion.div>
       </div>
 
+      {/* Target scroll anchor directly on the tools animation carousel */}
       <motion.div
+        id="tools"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1, delay: 0.2 }}
-        className="w-full relative mt-4"
+        className="w-full relative mt-4 scroll-mt-28"
         style={{
           maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
           WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)"

@@ -21,13 +21,13 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white border-b border-gray-200 py-3 shadow-sm"
+          ? "bg-white/90 backdrop-blur-md border-b border-gray-200/80 py-3 shadow-sm"
           : "bg-transparent py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Left Navigation Links (Image 1 reference) */}
+          {/* Left Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-600">
             <Link
               href="#services"
@@ -43,7 +43,7 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
             </Link>
           </nav>
 
-          {/* Center Logo (matching Hero section: Sky L ● gic with yellow glowing dot) */}
+          {/* Center Logo */}
           <Link href="/" className="flex items-center space-x-1 group">
             <span
               className="text-2xl font-extrabold tracking-tight text-gray-900 group-hover:text-[#2563EB] transition-colors"
@@ -68,16 +68,16 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
             </span>
           </Link>
 
-          {/* Right Navigation Links & Language Switcher (Image 1 reference) */}
+          {/* Right Navigation Links & Language Switcher */}
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-600">
             <Link
-              href="#stack"
+              href="#tools"
               className="hover:text-gray-900 transition-colors duration-200"
             >
               Tools
             </Link>
             <Link
-              href="#about"
+              href="#how-it-works"
               className="hover:text-gray-900 transition-colors duration-200"
             >
               How It Works
@@ -130,14 +130,14 @@ export function Navbar({ siteName = "SkyLogic" }: { siteName?: string }) {
             Feature Projects
           </Link>
           <Link
-            href="#stack"
+            href="#tools"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-gray-600 hover:text-gray-900 py-2"
           >
             Tools
           </Link>
           <Link
-            href="#about"
+            href="#how-it-works"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-gray-600 hover:text-gray-900 py-2"
           >
