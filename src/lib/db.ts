@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
-  const connectionUrl = process.env.DATABASE_URL || "mysql://root:dbnofun@localhost:3306/skylogic_db";
-  const adapter = new PrismaMariaDb(connectionUrl);
+  const connectionUrl = String(process.env.DATABASE_URL);
+  const adapter = new PrismaPg({ connectionString: connectionUrl });
   return new PrismaClient({ adapter });
 }
 

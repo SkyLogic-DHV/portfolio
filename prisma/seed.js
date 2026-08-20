@@ -82,8 +82,6 @@ const DEFAULT_STACK = [
   "Bootstrap",
   "Node.js",
   "PostgreSQL",
-  "MariaDB",
-  "MySQL",
   "Supabase",
   "Express.js",
   "Prisma",
