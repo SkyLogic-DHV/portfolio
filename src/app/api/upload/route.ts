@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { uploadImage } from "@/lib/storage";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -45,18 +44,12 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-
     // Sanitize filename
     const originalName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const fileExt = originalName.split(".").pop() || "png";
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-    const filePath = path.join(uploadsDir, fileName);
 
-    await writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/${fileName}`;
+    const fileUrl = await uploadImage(buffer, fileName, file.type);
 
     return NextResponse.json({
       url: fileUrl,
@@ -68,7 +61,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: "Gagal mengunggah gambar." },
+      { error: error instanceof Error ? error.message : "Gagal mengunggah gambar." },
       { status: 500 }
     );
   }
