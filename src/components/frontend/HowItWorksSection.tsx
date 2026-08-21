@@ -28,42 +28,42 @@ const steps: CardSpreadItem[] = [
     bgColor: "bg-[#E0F2FE]", // light sky
     textColor: "text-[#0369A1]",
   },
+  // {
+  //   id: 4,
+  //   badge: "04",
+  //   title: "Pengerjaan pasca bayar",
+  //   desc: "Proses pengerjaan segera dimulai setelah pembayaran termin (DP) diterima.",
+  //   bgColor: "bg-[#D1FAE5]", // light emerald
+  //   textColor: "text-[#047857]",
+  // },
   {
     id: 4,
     badge: "04",
-    title: "Pengerjaan pasca bayar",
-    desc: "Proses pengerjaan segera dimulai setelah pembayaran termin (DP) diterima.",
-    bgColor: "bg-[#D1FAE5]", // light emerald
-    textColor: "text-[#047857]",
-  },
-  {
-    id: 5,
-    badge: "05",
     title: "Tahap Design (UI/UX)",
     desc: "Membuat rancangan visual antarmuka website sesuai dengan identitas brand.",
     bgColor: "bg-[#FCE7F3]", // light pink
     textColor: "text-[#BE185D]",
   },
+  // {
+  //   id: 6,
+  //   badge: "06",
+  //   title: "Revisi design max 2x",
+  //   desc: "Memberikan kesempatan penyempurnaan desain sebelum masuk tahap coding.",
+  //   bgColor: "bg-[#FFEDD5]", // light orange
+  //   textColor: "text-[#C2410C]",
+  // },
   {
-    id: 6,
-    badge: "06",
-    title: "Revisi design max 2x",
-    desc: "Memberikan kesempatan penyempurnaan desain sebelum masuk tahap coding.",
-    bgColor: "bg-[#FFEDD5]", // light orange
-    textColor: "text-[#C2410C]",
-  },
-  {
-    id: 7,
-    badge: "07",
+    id: 5,
+    badge: "05",
     title: "Mulai implementasi",
     desc: "Proses pengembangan (coding) mengubah desain visual menjadi website fungsional.",
     bgColor: "bg-[#E0E7FF]", // light indigo
     textColor: "text-[#4338CA]",
   },
   {
-    id: 8,
-    badge: "08",
-    title: "Garansi 1 bulan",
+    id: 6,
+    badge: "06",
+    title: "Bergaransi",
     desc: "Dukungan teknis dan garansi perbaikan bug selama 1 bulan penuh setelah rilis.",
     bgColor: "bg-[#CCFBF1]", // light teal
     textColor: "text-[#0F766E]",
