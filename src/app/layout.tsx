@@ -23,6 +23,9 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  verification: {
+    google: "khDU4ByscxnZahazN3QxSJIW1U1WnfG2BWXARLmH29M",
+  },
   title: "SkyLogic — Fullstack Developer & UI Specialist",
   description:
     "Portfolio SkyLogic: jasa pengembangan web fullstack, dashboard interaktif, dan UI/UX modern. Dibangun dengan Next.js dan Prisma.",
