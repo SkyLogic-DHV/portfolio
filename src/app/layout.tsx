@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,12 +19,22 @@ const robotoMono = Roboto_Mono({
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio — Fullstack Developer & UI Specialist",
-  description: "Interactive portfolio and content management dashboard built with Next.js App Router and Prisma.",
+  metadataBase: new URL(SITE_URL),
+  title: "SkyLogic — Fullstack Developer & UI Specialist",
+  description:
+    "Portfolio SkyLogic: jasa pengembangan web fullstack, dashboard interaktif, dan UI/UX modern. Dibangun dengan Next.js dan Prisma.",
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "SkyLogic",
+    title: "SkyLogic — Fullstack Developer & UI Specialist",
+    description:
+      "Jasa pengembangan web fullstack, dashboard interaktif, dan UI/UX modern.",
+    locale: "id_ID",
+  },
 };
 
 export default function RootLayout({
